@@ -13,8 +13,17 @@
  * 
  *          Sequelize -> Foi utilizado em muitos projetos desde o início 
  *          do node
- *          Prisma    -> É uma dependência atual que trabalha com 
- *          BD (SQL ou ORM)
+ * 
+ *          Prisma    -> É uma dependência atual que trabalha com BD (SQL ou ORM)
+ *              npm install prisma --save           -> instalar o prisma (conexão com o database)
+ *              npm install @prisma/client --save   -> instalar o cliente do prisma (executar scripts SQL no DB)
+ *              npx prisma init                     -> Prompt de comando para inicializar o prisma
+ *              npx prisma migrate dev              -> Realiza o sincronismo entre o prisma e o BD (CUIDADO, 
+ *                                                     durante esse processo você pode perder dados reais, pois
+ *                                                     ele pega e cria as tabelas programadas no ORM schema.prisma)
+ *              npx prisma generate                 -> Apenas realiza o sincronismo entre o prisma e o banco de dados,
+ *                                                     geralmente usamos para rodar o projeto em um PC novo
+ *          
  *          Knex      -> É uma depêndencia atual que trabalha com MySQL
  *      
  *      Banco de dados não relacional:
@@ -24,7 +33,7 @@
  ********************************************************************/
 
 //Import da dependência do prisma que permite a execução do de script SQL no BD 
-const {PrismaClient} = require('@prisma/client') 
+const {PrismaClient} = require('../../generated/prisma') 
 
 //Cria um novo objeto baseado na classe PrismaClient
 const prisma = new PrismaClient()
