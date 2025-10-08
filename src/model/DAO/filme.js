@@ -58,14 +58,16 @@ const getSelectAllFilms = async () => {
     try {
        
         // Script SQL
-        let sql = `select * from tb_filme order by id desc`
+        let sql = `select * from tb_filmes order by filme_id desc`
 
         // Encaminha o script para o banco de dados
         let result = await prisma.$queryRawUnsafe(sql)
 
-        let verify = result.length > 0 ? result : false
-
-        return verify
+        if (Array.isArray(result)) {
+            return result
+        } else {
+            return false
+        }
     
     } catch (error) {
 
@@ -78,6 +80,26 @@ const getSelectAllFilms = async () => {
 
 // Retorna um filme filtrando pelo id do banco de dados
 const getSelectByIdFilms = async (id) => {
+
+    try {
+       
+        // Script SQL
+        let sql = `select * from tb_filmes where filme_id=${id}`
+
+        // Encaminha o script para o banco de dados
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        if (Array.isArray(result)) {
+            return result
+        } else {
+            return false
+        }
+    
+    } catch (error) {
+
+        return false
+
+    }
 
 } 
 
@@ -97,5 +119,6 @@ const setDeleteFilms = async (id) => {
 }
 
 module.exports = {
-    getSelectAllFilms
+    getSelectAllFilms,
+    getSelectByIdFilms
 }

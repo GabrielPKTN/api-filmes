@@ -33,9 +33,22 @@ app.use((request, response, next) => {
 const controllerFilme = require("./src/controller/filme/controller_filme.js")
 
 app.get('/v1/locadora/filmes', cors(), async (req, res) => {
-    let filmes = await controllerFilme.listarFilmes
+    let filmes = await controllerFilme.listarFilmes()
+    
+
     res.status(filmes.status_code)
     res.json(filmes)
+})
+
+app.get('/v1/locadora/filme/:id', cors(), async (req, res) => {
+
+    let id_filme = req.params.id
+
+    let filme = await controllerFilme.buscarFilmeId(id_filme)
+
+    res.status(filme.status_code)
+    res.json(filme)
+
 })
 
 app.listen(PORT, () => {

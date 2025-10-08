@@ -7,27 +7,76 @@
  *********************************************************************/
 
 const filmeDAO = require("../../model/dao/filme.js")
-const MESSAGES = require("../modulo/config_messages.js")
+const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const listarFilmes = async () => {
-    //Chama a função de DAO para retornar a listas de filmes
-    let resultFilmes = await filmeDAO.getSelectAllFilms()
-    console.log(resultFilmes)
+    try {
 
-    if(resultFilmes) {
-        if (resultFilmes.lenght > 0) {
-            MESSAGES.MESSAGE_HEADER.status          = MESSAGES.MESSAGE_REQUEST_SUCCES.status
-            MESSAGES.MESSAGE_HEADER.status_code     = MESSAGES.MESSAGE_REQUEST_SUCCES.status_code
-            MESSAGES.MESSAGE_HEADER.items.filme     = resultFilmes
+        // Cópia do objeto DEFAULT_MESSAGES
+        let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+    
+        //Chama a função de DAO para retornar a listas de filmes
+        let resultFilmes = await filmeDAO.getSelectAllFilms()
 
-            return MESSAGES.MESSAGE_HEADER
+        if(resultFilmes) {
+            if (resultFilmes.length > 0) {
+                MESSAGES.DEFAULT_HEADER.status       = DEFAULT_MESSAGES.SUCCESS_REQUEST.status
+                MESSAGES.DEFAULT_HEADER.status_code  = DEFAULT_MESSAGES.SUCCESS_REQUEST.status_code
+                MESSAGES.DEFAULT_HEADER.items.filme  = resultFilmes
+
+                
+                return MESSAGES.DEFAULT_HEADER //200
+            } else {
+                return MESSAGES.ERROR_NOT_FOUND //404
+            }
+        } else {
+            return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
         }
+
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
+    
 
 }
 
-const buscarFilmeId = async () => {
+const buscarFilmeId = async (id) => {
     
+    // Cópia do objeto DEFAULT_MESSAGES
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+
+        //Validação da chegada do id
+        if(!isNaN(id)) {
+
+            let resultFilme = await filmeDAO.getSelectByIdFilms(Number(id))
+            
+            if(resultFilme) {
+                if(resultFilme.length > 0) {
+
+                    MESSAGES.DEFAULT_HEADER.status       = DEFAULT_MESSAGES.SUCCESS_REQUEST.status
+                    MESSAGES.DEFAULT_HEADER.status_code  = DEFAULT_MESSAGES.SUCCESS_REQUEST.status_code
+                    MESSAGES.DEFAULT_HEADER.items.filme  = resultFilme
+
+                    return MESSAGES.DEFAULT_HEADER //200
+
+                } else {
+                    return MESSAGES.ERROR_NOT_FOUND //404
+                }
+
+            } else {
+                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+            }
+
+        } else {
+            return MESSAGES.ERROR_REQUIRED_FIELDS //400
+        }
+
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+    }
+
 }
 
 // Insere um filme
@@ -46,5 +95,6 @@ const excluirFilme = async (id) => {
 }
 
 module.exports = {
-    listarFilmes
+    listarFilmes,
+    buscarFilmeId
 }
