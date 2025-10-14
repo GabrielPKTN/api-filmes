@@ -30,6 +30,12 @@ const SUCCESS_REQUEST = {
 }
 
 
+const SUCCESS_CREATED_ITEM = {
+    status: true,
+    status_code:201,
+    message: 'Item criado com sucesso!!!'
+}
+
 // ********************************************************MENSAGENS DE ERRO
 
 const ERROR_NOT_FOUND = {
@@ -56,14 +62,20 @@ const ERROR_INTERNAL_SERVER_MODEL = {
     message: 'Não foi possível processar a requisição devido a erros internos no servidor (MODELAGEM DE DADOS)!!!'
 }
 
-
+const ERROR_CONTENT_TYPE = {
+    status: false,
+    status_code: 415,
+    message: 'Não foi possível processar a requisição, pois o tipo de dados enviado no corpo deve ser JSON!!!'
+}
 
 
 module.exports = {
     DEFAULT_HEADER,
     SUCCESS_REQUEST,
+    SUCCESS_CREATED_ITEM,
     ERROR_REQUIRED_FIELDS,
     ERROR_NOT_FOUND,
     ERROR_INTERNAL_SERVER_CONTROLLER,
-    ERROR_INTERNAL_SERVER_MODEL
+    ERROR_INTERNAL_SERVER_MODEL,
+    ERROR_CONTENT_TYPE
 }
