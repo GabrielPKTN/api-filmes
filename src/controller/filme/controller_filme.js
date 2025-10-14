@@ -48,7 +48,7 @@ const buscarFilmeId = async (id) => {
     try {
 
         //Validação da chegada do id
-        if(!isNaN(id)) {
+        if(!isNaN(id) && id != '' && id != null && id > 0) {
 
             let resultFilme = await filmeDAO.getSelectByIdFilms(Number(id))
             
