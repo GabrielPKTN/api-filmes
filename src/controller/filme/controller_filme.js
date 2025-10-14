@@ -103,7 +103,7 @@ const inserirFilme = async (filme, contentType) => {
                 MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Data de lançamento incorreta]'
                 return MESSAGES.ERROR_REQUIRED_FIELDS
 
-            } else if (filme.duracao == '' || filme.duracao == undefined || filme.duracao == null || filme.duracao.length != 8) {
+            } else if (filme.duracao == '' || filme.duracao == undefined || filme.duracao == null || filme.duracao.length > 8) {
                 MESSAGES.ERROR_REQUIRED_FIELDS.message += '[Duração incorreta]'
                 return MESSAGES.ERROR_REQUIRED_FIELDS
 
@@ -165,5 +165,6 @@ const excluirFilme = async (id) => {
 
 module.exports = {
     listarFilmes,
-    buscarFilmeId
+    buscarFilmeId,
+    inserirFilme
 }
