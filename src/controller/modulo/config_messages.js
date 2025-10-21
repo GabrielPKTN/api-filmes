@@ -29,6 +29,16 @@ const SUCCESS_REQUEST = {
     message: 'Requisição bem sucedida!!!'
 }
 
+const SUCCESS_DELETE = {
+    status: true,
+    status_code: 200,
+    message: "Delete realizado com sucesso!!!"
+}
+const SUCCESS_UPDATE_ITEM = {
+    status: true,
+    status_code: 200,
+    message: "Item atualizado com sucesso!!!"
+}
 
 const SUCCESS_CREATED_ITEM = {
     status: true,
@@ -73,6 +83,8 @@ module.exports = {
     DEFAULT_HEADER,
     SUCCESS_REQUEST,
     SUCCESS_CREATED_ITEM,
+    SUCCESS_DELETE,
+    SUCCESS_UPDATE_ITEM,
     ERROR_REQUIRED_FIELDS,
     ERROR_NOT_FOUND,
     ERROR_INTERNAL_SERVER_CONTROLLER,

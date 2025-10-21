@@ -83,6 +83,13 @@ app.put('/v1/locadora/filme/:id', cors(), bodyParserJSON, async (req, res) => {
 
 })
 
+app.delete('/v1/locadora/delete/filme/:id', cors(), async function (request, response) {
+    let idFilme = Number(request.params.id);
+    let filme = await controllerFilme.excluirFilme(idFilme)
+    response.status(filme.status_code)
+    response.json(filme)
+})
+
 app.listen(PORT, () => {
     console.log('Está vivo...!!!')
 })

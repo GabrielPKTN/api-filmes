@@ -119,7 +119,7 @@ const getSelectLastId = async () => {
 
     } catch (error) {
         return false
-        
+
     }
 }
 
@@ -188,7 +188,21 @@ const setUpdateFilms = async (filme) => {
 // Exclui um filme pelo id no banco de dados
 const setDeleteFilms = async (id) => {
 
+    try {
+        
+        let sql = `delete from tb_filmes where filme_id = ${id}`
 
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result) {
+            return true
+        } else {
+            return false
+        }
+
+    } catch (error) {
+        return false
+    }
     
 }
 
@@ -197,5 +211,6 @@ module.exports = {
     getSelectByIdFilms,
     getSelectLastId,
     setInsertFilms,
-    setUpdateFilms
+    setUpdateFilms,
+    setDeleteFilms
 }

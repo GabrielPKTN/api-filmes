@@ -41,17 +41,15 @@ const listarFilmes = async () => {
 }
 
 const buscarFilmeId = async (id) => {
-
     // Cópia do objeto DEFAULT_MESSAGES
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
     try {
-
         //Validação da chegada do id
         if (!isNaN(id) && id != '' && id != null && id > 0) {
 
             let resultFilme = await filmeDAO.getSelectByIdFilms(Number(id))
-
+            
             if (resultFilme) {
                 if (resultFilme.length > 0) {
 
@@ -104,7 +102,7 @@ const inserirFilme = async (filme, contentType) => {
                     let lastId = await filmeDAO.getSelectLastId()
                     
                     if (lastId) {
-                        console.log(lastId)
+
                         //Adiciona o id no json com os dados do filme
                         filme.id = lastId
 
@@ -163,9 +161,9 @@ const atualizarFilme = async (filme, id, contentType) => {
 
                     if (resultFilme) {
 
-                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATE_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATE_ITEM.message
                         MESSAGES.DEFAULT_HEADER.items = filme
 
                         return MESSAGES.DEFAULT_HEADER //200
@@ -177,11 +175,13 @@ const atualizarFilme = async (filme, id, contentType) => {
                     }
 
                 } else {
-                    return validarId
+
+                    return validarId // A função podera retornar (400 ou 404 ou 500)
                 }
 
             } else {
-                return validar
+
+                return validar // Referente a validação de dados
             }
 
         } else {
@@ -196,6 +196,29 @@ const atualizarFilme = async (filme, id, contentType) => {
 //Exclui um filme pelo ID
 const excluirFilme = async (id) => {
 
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+        
+        let validarId = await buscarFilmeId(id)
+        
+        if (validarId.status_code == 200) {
+            
+            deletarFilme = await filmeDAO.setDeleteFilms(id);
+            MESSAGES.DEFAULT_HEADER.status      =   MESSAGES.SUCCESS_DELETE.status
+            MESSAGES.DEFAULT_HEADER.status_code =   MESSAGES.SUCCESS_DELETE.status_code
+            MESSAGES.DEFAULT_HEADER.message     =   MESSAGES.SUCCESS_DELETE.message
+            delete MESSAGES.DEFAULT_HEADER.items
+
+            return MESSAGES.DEFAULT_HEADER
+
+        } else {
+            validarId
+        }
+
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
 }
 
 const validarDadosFilme = async function (filme) {
@@ -239,5 +262,6 @@ module.exports = {
     listarFilmes,
     buscarFilmeId,
     inserirFilme,
-    atualizarFilme
+    atualizarFilme,
+    excluirFilme
 }
