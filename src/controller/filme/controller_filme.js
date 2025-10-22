@@ -6,7 +6,7 @@
  * Versão: 1.0.0
  *********************************************************************/
 
-const filmeDAO = require("../../model/dao/filme.js")
+const filmeDAO = require("../../model/DAO/filme.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const listarFilmes = async () => {

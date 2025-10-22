@@ -92,26 +92,25 @@ const buscarGeneroId = async (id) => {
 }
 
 const inserirGenero = async (genero, contentType) => {
-
     // Cópia do objeto DEFAULT_MESSAGES
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
     try {
         
         if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
-
-            let validar = validarDadosGenero(genero)
+            
+            let validar = await validarDadosGenero(genero)
 
             if (!validar) {
 
                 //Processamento
                 //Chamando função para inserir o genero no BD
-                let result = generoDAO.setInsertGenres(genero)
+                let result = await generoDAO.setInsertGenres(genero)
 
                 if (result) {
 
                     let lastId = await generoDAO.getSelectLastId()
-                    
+
                     if (lastId) {
 
                         MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_CREATED_ITEM.status
@@ -145,7 +144,8 @@ const inserirGenero = async (genero, contentType) => {
 
 
     } catch (error) {
-        
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
+
     }
 
 }

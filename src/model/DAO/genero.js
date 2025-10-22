@@ -107,23 +107,32 @@ const getSelectLastId = async () => {
 }
 
 const setInsertGenres = async (genero) => {
-
-    sql = `INSERT INTO tb_genero(nome_genero) 
+    
+    try {
+        
+        sql = `INSERT INTO tb_genero(nome_genero) 
             VALUES (
-                ${genero.nome_genero}
+                '${genero.nome_genero}'
             );`
 
-    result = prisma.$executeRawUnsafe(sql)
+        result = await prisma.$executeRawUnsafe(sql)
 
-    if (result) {
+        if (result) {
+            
+            return result
 
-        return result
+        } else {
 
-    } else {
+            return false
+
+        }
+
+    } catch (error) {
 
         return false
 
     }
+    
 
 }
 

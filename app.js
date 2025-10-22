@@ -112,7 +112,7 @@ app.get('/v1/locadora/genero/:id', cors(), async (req, res) => {
 
 })
 
-app.post('/v1/locadora/genero', cors(), async (req, res) => {
+app.post('/v1/locadora/genero', bodyParserJSON, cors(), async (req, res) => {
 
     let dadosBody = req.body
     let contentType = req.headers['content-type']
