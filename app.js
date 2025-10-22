@@ -47,7 +47,7 @@ app.get('/v1/locadora/filme/:id', cors(), async (req, res) => {
 
     let id_filme = req.params.id
 
-    let filme = await controllerFilme.buscarFilmeId(id_filme)
+    let filme = await controllerFilme.buscarFilmeId(Number(id_filme))
 
     res.status(filme.status_code)
     res.json(filme)
@@ -98,6 +98,17 @@ app.get('/v1/locadora/generos', cors(), async (req, res) => {
 
     res.status(generos.status_code)
     res.json(generos)
+
+})
+
+app.get('/v1/locadora/genero/:id', cors(), async (req, res) => {
+    
+    const id = req.params.id
+
+    let genero = await controllerGenero.buscarGeneroId(id)
+
+    res.status(genero.status_code)
+    res.json(genero)
 
 })
 

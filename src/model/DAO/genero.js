@@ -26,7 +26,7 @@ const prisma = new PrismaClient()
     //variável e que não retorna dados do banco (INSERT, UPDATE e DELETE)
     //e executa tratamentos com segurança
 
-
+// Retorna todos os generos da tabela
 const getSelectAllGenre = async () => {
 
     try {
@@ -53,7 +53,30 @@ const getSelectAllGenre = async () => {
     
 }
 
-const getSelectGenreById = async () => {
+// Retorna o genero pelo id
+const getSelectGenreById = async (id) => {
+
+    try {
+        
+        sql = `select * from tb_genero where genero_id = ${id}`
+
+        result = await prisma.$queryRawUnsafe(sql)
+
+        if (Array.isArray(result)) {
+            
+            return result
+
+        } else {
+
+            return false
+
+        }
+
+    } catch (error) {
+        
+        return false
+
+    }
 
 }
 
@@ -74,5 +97,6 @@ const setDeleteGenres = async () => {
 }
 
 module.exports = {
-    getSelectAllGenre
+    getSelectAllGenre,
+    getSelectGenreById
 }
