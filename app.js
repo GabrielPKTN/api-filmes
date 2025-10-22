@@ -103,9 +103,21 @@ app.get('/v1/locadora/generos', cors(), async (req, res) => {
 
 app.get('/v1/locadora/genero/:id', cors(), async (req, res) => {
     
-    const id = req.params.id
+    let id = req.params.id
 
     let genero = await controllerGenero.buscarGeneroId(id)
+
+    res.status(genero.status_code)
+    res.json(genero)
+
+})
+
+app.post('/v1/locadora/genero', cors(), async (req, res) => {
+
+    let dadosBody = req.body
+    let contentType = req.headers['content-type']
+
+    let genero = await controllerGenero.inserirGenero(dadosBody, contentType)
 
     res.status(genero.status_code)
     res.json(genero)

@@ -106,7 +106,24 @@ const getSelectLastId = async () => {
 
 }
 
-const setInsertGenres = async () => {
+const setInsertGenres = async (genero) => {
+
+    sql = `INSERT INTO tb_genero(nome_genero) 
+            VALUES (
+                ${genero.nome_genero}
+            );`
+
+    result = prisma.$executeRawUnsafe(sql)
+
+    if (result) {
+
+        return result
+
+    } else {
+
+        return false
+
+    }
 
 }
 
@@ -118,10 +135,9 @@ const setDeleteGenres = async () => {
 
 }
 
-getSelectLastId()
-
 module.exports = {
     getSelectAllGenre,
     getSelectGenreById,
-    getSelectLastId
+    getSelectLastId,
+    setInsertGenres
 }
