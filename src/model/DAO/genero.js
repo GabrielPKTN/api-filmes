@@ -82,6 +82,28 @@ const getSelectGenreById = async (id) => {
 
 const getSelectLastId = async () => {
 
+    try {
+        
+        sql = 'select * from tb_genero order by genero_id desc limit 1'
+
+        result = await prisma.$queryRawUnsafe(sql)
+
+        if (Array.isArray(result)) {
+            
+            return result
+
+        } else {
+
+            return false
+
+        }
+        
+    } catch (error) {
+     
+        return false
+
+    }
+
 }
 
 const setInsertGenres = async () => {
@@ -96,7 +118,10 @@ const setDeleteGenres = async () => {
 
 }
 
+getSelectLastId()
+
 module.exports = {
     getSelectAllGenre,
-    getSelectGenreById
+    getSelectGenreById,
+    getSelectLastId
 }
