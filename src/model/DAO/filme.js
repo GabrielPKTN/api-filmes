@@ -1,5 +1,5 @@
 /**********************************************************************
- * Objetivo: Arquivo responsável pelo CRUD de dados no MySQL, referente
+ * Objetivo: Arquivo responsável pelo CRUD da tabela no MySQL, referente
  * ao filme
  * Data: 01/10/2025
  * Developer: Gabriel Lacerda Correia
@@ -103,6 +103,7 @@ const getSelectByIdFilms = async (id) => {
 
 } 
 
+// Retorna o último filme adicionado na tabela 
 const getSelectLastId = async () => {
     try {
         // script SQL para retornar apenas o último id do BD

@@ -83,11 +83,22 @@ app.put('/v1/locadora/filme/:id', cors(), bodyParserJSON, async (req, res) => {
 
 })
 
-app.delete('/v1/locadora/delete/filme/:id', cors(), async function (request, response) {
-    let idFilme = Number(request.params.id);
+app.delete('/v1/locadora/delete/filme/:id', cors(), async (req, res) => {
+    let idFilme = Number(req.params.id);
     let filme = await controllerFilme.excluirFilme(idFilme)
-    response.status(filme.status_code)
-    response.json(filme)
+    res.status(filme.status_code)
+    res.json(filme)
+})
+
+const controllerGenero = require("./src/controller/genero/controller_genero.js")
+
+app.get('/v1/locadora/generos', cors(), async (req, res) => {
+
+    let generos = await controllerGenero.listarGeneros()
+
+    res.status(generos.status_code)
+    res.json(generos)
+
 })
 
 app.listen(PORT, () => {
