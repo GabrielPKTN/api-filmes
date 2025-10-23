@@ -46,7 +46,7 @@ const getSelectAllGenre = async () => {
         }
 
     } catch (error) {
-
+        console.log(error)
         return false
 
     }
@@ -136,7 +136,25 @@ const setInsertGenres = async (genero) => {
 
 }
 
-const setUpdateGenres = async () => {
+const setUpdateGenres = async (id, genero) => {
+
+    try {
+        
+        let sql =  `update tb_genero set nome_genero = '${genero.nome_genero}' where genero_id  = ${id}`
+
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if(result) {
+            return result
+        } else {
+            return false
+        }
+
+    } catch (error) {
+        return false
+    }
+
+    
 
 }
 
@@ -148,5 +166,6 @@ module.exports = {
     getSelectAllGenre,
     getSelectGenreById,
     getSelectLastId,
-    setInsertGenres
+    setInsertGenres,
+    setUpdateGenres
 }

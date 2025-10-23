@@ -37,7 +37,7 @@ const listarGeneros = async () => {
             return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
 
         }
-        
+
     } catch (error) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
 
@@ -57,23 +57,23 @@ const buscarGeneroId = async (id) => {
 
             let result = await generoDAO.getSelectGenreById(id)
 
-            if(result) {
+            if (result) {
                 if (result.length > 0) {
 
-                    MESSAGES.DEFAULT_HEADER.status          =   MESSAGES.SUCCESS_REQUEST.status
-                    MESSAGES.DEFAULT_HEADER.status_code     =   MESSAGES.SUCCESS_REQUEST.status_code
-                    MESSAGES.DEFAULT_HEADER.items.genre     =   result
+                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
+                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
+                    MESSAGES.DEFAULT_HEADER.items.genre = result
 
                     return MESSAGES.DEFAULT_HEADER //200
 
                 } else {
 
                     return MESSAGES.ERROR_NOT_FOUND //404
-                    
+
                 }
-                
+
             } else {
-                
+
                 return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
             }
 
@@ -82,7 +82,7 @@ const buscarGeneroId = async (id) => {
             return MESSAGES.ERROR_REQUIRED_FIELDS //400
 
         }
-        
+
     } catch (error) {
 
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
@@ -96,9 +96,9 @@ const inserirGenero = async (genero, contentType) => {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
     try {
-        
+
         if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
-            
+
             let validar = await validarDadosGenero(genero)
 
             if (!validar) {
@@ -113,9 +113,9 @@ const inserirGenero = async (genero, contentType) => {
 
                     if (lastId) {
 
-                        MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_CREATED_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCESS_CREATED_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message             = MESSAGES.SUCCESS_CREATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
                         MESSAGES.DEFAULT_HEADER.items.created_genre = lastId
 
                         return MESSAGES.DEFAULT_HEADER
@@ -152,6 +152,63 @@ const inserirGenero = async (genero, contentType) => {
 
 const atualizarGenero = async (id, genero, contentType) => {
 
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+
+        if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
+
+            let validar = await validarDadosGenero(genero)
+
+            if (!validar) {
+
+                let validarId = await buscarGeneroId(id)
+
+                if (validarId.status_code == 200) {
+
+                    //Processamento
+                    //Chamando função para inserir o genero no BD
+                    let result = await generoDAO.setUpdateGenres(id, genero)
+
+                    if (result) {
+
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATE_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATE_ITEM.message
+                        delete MESSAGES.DEFAULT_HEADER.items
+
+                        return MESSAGES.DEFAULT_HEADER //200
+
+                    } else {
+
+                        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+
+                    }
+
+                } else {
+
+                    return validarId // (500 ou 404 ou 400)
+
+                }
+
+            } else {
+
+                return validar //400
+
+            }
+
+        } else {
+
+            return MESSAGES.ERROR_CONTENT_TYPE //415
+
+        }
+
+    } catch (error) {
+
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+
+    }
+
 }
 
 const excluirGenero = async (id) => {
@@ -179,5 +236,6 @@ const validarDadosGenero = async (genero) => {
 module.exports = {
     listarGeneros,
     buscarGeneroId,
-    inserirGenero
+    inserirGenero,
+    atualizarGenero
 }

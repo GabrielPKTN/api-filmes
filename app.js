@@ -124,6 +124,19 @@ app.post('/v1/locadora/genero', bodyParserJSON, cors(), async (req, res) => {
 
 })
 
+app.put('/v1/locadora/genero/:id', bodyParserJSON, cors(), async (req, res) => {
+    
+    let dadosBody = req.body
+    let id = req.params.id
+    let contentType = req.headers['content-type']
+
+    let generoAtualizado = await controllerGenero.atualizarGenero(id, dadosBody, contentType)
+
+    res.status(generoAtualizado.status_code)
+    res.json(generoAtualizado)
+
+})
+
 app.listen(PORT, () => {
     console.log('Está vivo...!!!')
 })
