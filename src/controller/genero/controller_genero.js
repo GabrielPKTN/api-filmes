@@ -175,7 +175,9 @@ const atualizarGenero = async (id, genero, contentType) => {
                         MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATE_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATE_ITEM.message
-                        delete MESSAGES.DEFAULT_HEADER.items
+                        
+                        let genre = genero.nome_genero
+                        MESSAGES.DEFAULT_HEADER.items.updated_genre = {id, genre}
 
                         return MESSAGES.DEFAULT_HEADER //200
 
@@ -213,6 +215,39 @@ const atualizarGenero = async (id, genero, contentType) => {
 
 const excluirGenero = async (id) => {
 
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+        
+        let validarId = buscarGeneroId()
+
+        if (validarId) {
+
+            let result = generoDAO.setDeleteGenre(id) 
+
+            if (result) {
+
+                MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_DELETE.status
+                MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_DELETE.status_code
+                MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_DELETE.message
+                delete MESSAGES.DEFAULT_HEADER.items
+
+                return MESSAGES.DEFAULT_HEADER //200
+
+            } else {
+                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL // 500
+            }
+
+        } else {
+
+            return validarId // (500, 404, 400)
+
+        }
+
+    } catch (error) {
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER // 500
+    }
+
 }
 
 const validarDadosGenero = async (genero) => {
@@ -237,5 +272,6 @@ module.exports = {
     listarGeneros,
     buscarGeneroId,
     inserirGenero,
-    atualizarGenero
+    atualizarGenero,
+    excluirGenero
 }

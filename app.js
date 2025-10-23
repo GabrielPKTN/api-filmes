@@ -137,6 +137,17 @@ app.put('/v1/locadora/genero/:id', bodyParserJSON, cors(), async (req, res) => {
 
 })
 
+app.delete('/v1/locadora/delete/genero/:id', cors(), async (req, res) => {
+
+    let id = req.params.id
+
+    let deleteGenero = await controllerGenero.excluirGenero(id)
+
+    res.status(deleteGenero.status_code)
+    res.json(deleteGenero)
+
+})
+
 app.listen(PORT, () => {
     console.log('Está vivo...!!!')
 })

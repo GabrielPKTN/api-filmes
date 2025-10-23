@@ -158,7 +158,23 @@ const setUpdateGenres = async (id, genero) => {
 
 }
 
-const setDeleteGenres = async () => {
+const setDeleteGenre = async (id) => {
+
+    try {
+
+        let sql = `delete from tb_genero where genero_id = ${id}`
+
+        let result = prisma.$executeRawUnsafe(sql)
+
+        if (result) {
+            return result
+        } else {
+            return false
+        }
+
+    } catch (error) {
+        return false
+    }
 
 }
 
@@ -167,5 +183,6 @@ module.exports = {
     getSelectGenreById,
     getSelectLastId,
     setInsertGenres,
-    setUpdateGenres
+    setUpdateGenres,
+    setDeleteGenre
 }
