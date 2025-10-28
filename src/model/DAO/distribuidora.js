@@ -178,7 +178,7 @@ const setDeleteDistributor = async (id) => {
 
     try {
         
-        const sql = `delete from tb_distribuidora where distribuidora_id = 5`
+        const sql = `delete from tb_distribuidora where distribuidora_id = ${id}`
 
         const result = await prisma.$executeRawUnsafe(sql)
 
@@ -195,14 +195,11 @@ const setDeleteDistributor = async (id) => {
 
 }
 
-setDeleteDistributor()
-
 module.exports = {
     getSelectAllDistributor,
     getSelectDistributorById,
     getSelectLastDistributor,
     setInsertDistributor,
     setUpdateDistributorById,
-
-
+    setDeleteDistributor
 }
