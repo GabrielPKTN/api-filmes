@@ -80,6 +80,7 @@ const getSelectGenreById = async (id) => {
 
 }
 
+// Retorna o último id de genero registrado na tabela
 const getSelectLastId = async () => {
 
     try {
@@ -106,6 +107,7 @@ const getSelectLastId = async () => {
 
 }
 
+// Registra um gênero na tabela
 const setInsertGenres = async (genero) => {
     
     try {
@@ -136,6 +138,7 @@ const setInsertGenres = async (genero) => {
 
 }
 
+// Atualiza o registro de um gênero na tabela pelo id
 const setUpdateGenres = async (id, genero) => {
 
     try {
@@ -158,6 +161,7 @@ const setUpdateGenres = async (id, genero) => {
 
 }
 
+// Deleta um registro da tabela gênero pelo id
 const setDeleteGenre = async (id) => {
 
     try {
