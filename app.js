@@ -148,6 +148,64 @@ app.delete('/v1/locadora/delete/genero/:id', cors(), async (req, res) => {
 
 })
 
+const controllerDistribuidora = require("./src/controller/distribuidora/controller_distribuidora.js")
+
+app.get('/v1/locadora/distribuidora', cors(), async (req, res) => {
+
+    let distribuidoras = await controllerDistribuidora.listarDistribuidora()
+
+    res.status(distribuidoras.status_code)
+    res.json(distribuidoras)
+
+})
+
+app.get('/v1/locadora/distribuidora/:id', cors(), async (req, res) => {
+
+    let idDistribuidora = req.params.id
+
+    let distribuidora = await controllerDistribuidora.buscarDistribuidoraId(idDistribuidora)
+
+    res.status(distribuidora.status_code)
+    res.json(distribuidora)
+
+})
+
+app.post('/v1/locadora/distribuidora', bodyParserJSON, cors(), async (req, res) => {
+
+    let dadosBody = req.body
+    let contentType = req.headers['content-type']
+
+    let distribuidora = await controllerDistribuidora.inserirDistribuidora(dadosBody, contentType)
+
+    res.status(distribuidora.status_code)
+    res.json(distribuidora)
+
+})
+
+app.put('/v1/locadora/distribuidora/:id', bodyParserJSON, cors(), async (req, res) => {
+
+    let distribuidoraId = req.params.id
+    let dadosBody = req.body
+    let contentType = req.headers['content-type']
+
+    let atualizaDistribuidora = await controllerDistribuidora.atualizarDistribuidora(distribuidoraId, dadosBody, contentType)
+
+    res.status(atualizaDistribuidora.status_code)
+    res.json(atualizaDistribuidora)
+
+})
+
+app.delete('/v1/locadora/delete/distribuidora/:id', cors(), async (req, res) => {
+
+    let distribuidoraId = req.params.id
+
+    let deleteDistribuidora = await controllerDistribuidora.excluirDistribuidora(distribuidoraId)
+
+    res.status(deleteDistribuidora.status_code)
+    res.json(deleteDistribuidora)
+
+})
+
 app.listen(PORT, () => {
     console.log('Está vivo...!!!')
 })

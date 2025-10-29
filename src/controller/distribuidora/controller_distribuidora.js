@@ -11,20 +11,20 @@ const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const listarDistribuidora = async () => {
     
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
     try {
-        
-        let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
         let result = await distribuidoraDAO.getSelectAllDistributor()
 
         if (result) {
             if(result.length > 0) {
 
-                MESSAGES.DEFAULT_MESSAGES.status = DEFAULT_MESSAGES.SUCCESS_REQUEST.status
-                MESSAGES.DEFAULT_MESSAGES.status_code = DEFAULT_MESSAGES.SUCCESS_REQUEST.status_code
-                MESSAGES.DEFAULT_MESSAGES.items.distributors = result
+                MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
+                MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
+                MESSAGES.DEFAULT_HEADER.items.distributors = result
 
-                return MESSAGES.DEFAULT_MESSAGES
+                return MESSAGES.DEFAULT_HEADER
 
             } else {
                 return MESSAGES.ERROR_NOT_FOUND // 404
@@ -48,17 +48,17 @@ const buscarDistribuidoraId = async (id) => {
 
         if (!isNaN(id) && id != '' && id != null && id > 0) {
 
-            let result = distribuidoraDAO.getSelectDistributorById(id)
+            let result = await distribuidoraDAO.getSelectDistributorById(id)
 
             if (result) {
 
                 if (result.length > 0) {
 
-                    MESSAGES.DEFAULT_MESSAGES.status = MESSAGES.SUCCESS_REQUEST.status
-                    MESSAGES.DEFAULT_MESSAGES.status_code = MESSAGES.SUCCESS_REQUEST.status_code
-                    MESSAGES.DEFAULT_MESSAGES.items.distributor = result
+                    MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
+                    MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
+                    MESSAGES.DEFAULT_HEADER.items.distributor = result
                     
-                    return MESSAGES.DEFAULT_MESSAGES // 200
+                    return MESSAGES.DEFAULT_HEADER // 200
 
                 } else {
                     return MESSAGES.ERROR_NOT_FOUND // 404
@@ -98,12 +98,12 @@ const inserirDistribuidora = async (distribuidora, contentType) => {
 
                     if (lastId) {
 
-                        MESSAGES.DEFAULT_MESSAGES.status = MESSAGES.SUCCESS_CREATED_ITEM.status
-                        MESSAGES.DEFAULT_MESSAGES.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
-                        MESSAGES.DEFAULT_MESSAGES.message = MESSAGES.SUCCESS_CREATED_ITEM.message
-                        MESSAGES.DEFAULT_MESSAGES.items = lastId.id + distribuidora
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.distributor_created = lastId
 
-                        return MESSAGES.DEFAULT_MESSAGES // 201
+                        return MESSAGES.DEFAULT_HEADER // 201
 
                     } else {
                         return MESSAGES.ERROR_INTERNAL_SERVER_MODEL // 500
@@ -146,12 +146,14 @@ const atualizarDistribuidora = async (id, distribuidora, contentType) => {
 
                     if (result) {
 
-                        MESSAGES.DEFAULT_MESSAGES.status = MESSAGES.SUCCESS_UPDATED.status
-                        MESSAGES.DEFAULT_MESSAGES.status_code = MESSAGES.SUCCESS_UPDATED.status_code
-                        MESSAGES.DEFAULT_MESSAGES.message = MESSAGES.SUCCESS_UPDATED.message
-                        MESSAGES.DEFAULT_MESSAGES.items.distributor = id + distribuidora
+                        let distribuidoraAtualizada = await buscarDistribuidoraId(id)
+
+                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATE_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATE_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.distributor_created = distribuidoraAtualizada.items.distributor
                         
-                        return MESSAGES.DEFAULT_MESSAGES // 200
+                        return MESSAGES.DEFAULT_HEADER // 200
 
                     } else {
                         return MESSAGES.ERROR_INTERNAL_SERVER_MODEL // 500
@@ -170,16 +172,18 @@ const atualizarDistribuidora = async (id, distribuidora, contentType) => {
         }
 
     } catch (error) {
-        return MESSAGES.ERROR_INTERNAL_SERVER_MODEL // 500
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 
 }
 
 const excluirDistribuidora = async (id) => {
 
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
     try {
         
-        let validarId = buscarDistribuidoraId(id)
+        let validarId = await buscarDistribuidoraId(id)
 
         if (validarId.status_code == 200) {
 
@@ -187,12 +191,12 @@ const excluirDistribuidora = async (id) => {
 
             if (result) {
 
-                MESSAGES.DEFAULT_MESSAGES.status = MESSAGES.SUCCESS_DELETE.status
-                MESSAGES.DEFAULT_MESSAGES.status_code = MESSAGES.SUCCESS_DELETE.status_code
-                MESSAGES.DEFAULT_MESSAGES.message = MESSAGES.SUCCESS_DELETE.message
-                MESSAGES.DEFAULT_MESSAGES.items.deleted_distributor = validarId.items.distributor
+                MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_DELETE.status
+                MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_DELETE.status_code
+                MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_DELETE.message
+                MESSAGES.DEFAULT_HEADER.items.deleted_distributor = validarId.items.distributor
 
-                return MESSAGES.DEFAULT_MESSAGES // 200
+                return MESSAGES.DEFAULT_HEADER // 200
 
             } else {
                 return MESSAGES.ERROR_INTERNAL_SERVER_MODEL // 500

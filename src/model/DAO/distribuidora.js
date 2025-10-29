@@ -155,9 +155,7 @@ const setUpdateDistributorById = async (id, distributor) => {
 
     try {
 
-        const sql = `update tb_distribuidora set
-                    nome_distribuidora  =   '${distributor.nome}'
-                    where distribuidora_id = ${id}`
+        const sql = `update tb_distribuidora set nome_distribuidora = '${distributor.nome}' where distribuidora_id = ${id}`
 
         const result = await prisma.$executeRawUnsafe(sql)
 
