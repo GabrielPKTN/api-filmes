@@ -20,6 +20,7 @@ CREATE TABLE tb_genero(
 	nome_genero VARCHAR(30) not null
 );
 
+-- CRUD FEITO
 CREATE TABLE tb_distribuidora(
 	distribuidora_id INT PRIMARY KEY AUTO_INCREMENT,
 	nome_distribuidora VARCHAR(50) not null
