@@ -83,7 +83,7 @@ const inserirDistribuidora = async (distribuidora, contentType) => {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
     try {
-        
+
         if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
 
         let validar = validarDadosDistribuidora(distribuidora)
