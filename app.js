@@ -382,6 +382,64 @@ app.delete('/v1/locadora/delete/papel/:id', cors(), async (req, res) => {
 
 })
 
+const controllerIdioma = require('./src/controller/idioma_dublagem/controller_idioma_dublagem.js')
+
+app.get('/v1/locadora/idioma/', cors(), async (req, res) => {
+
+    let idiomas = await controllerIdioma.listarIdiomas()
+
+    res.status(idiomas.status_code)
+    res.json(idiomas)
+
+})
+
+app.get('/v1/locadora/idioma/:id', cors(), async (req, res) => {
+
+    const id = req.params.id
+
+    let idioma = await controllerIdioma.buscarIdiomaId(id)
+
+    res.status(idioma.status_code)
+    res.json(idioma)
+
+})
+
+app.post('/v1/locadora/idioma/', cors(), bodyParserJSON, async (req, res) => {
+
+    const dadosBody = req.body
+    const contentType = req.headers['content-type']
+
+    let idioma = await controllerIdioma.inserirIdioma(dadosBody, contentType)
+
+    res.status(idioma.status_code)
+    res.json(idioma)
+
+})
+
+app.put('/v1/locadora/idioma/:id', cors(), bodyParserJSON, async (req, res) => {
+
+    const id = req.params.id
+    const dadosBody = req.body
+    const contentType = req.headers['content-type']
+
+    let idioma = await controllerIdioma.atualizarIdioma(id, dadosBody, contentType)
+
+    res.status(idioma.status_code)
+    res.json(idioma)
+
+})
+
+app.delete('/v1/locadora/delete/idioma/:id', cors(), async (req, res) => {
+
+    const id = req.params.id
+
+    let idioma = await controllerIdioma.excluirIdioma(id)
+
+    res.status(idioma.status_code)
+    res.json(idioma)
+
+})
+
 app.listen(PORT, () => {
     console.log('Está vivo...!!!')
 })

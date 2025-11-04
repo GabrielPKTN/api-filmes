@@ -38,10 +38,12 @@ CREATE TABLE tb_estudio(
 	nome_estudio VARCHAR(50) not null
 );
 
+-- CRUD FEITO
 CREATE TABLE tb_papel(
 	papel_id INT PRIMARY KEY AUTO_INCREMENT,
 	nome_papel VARCHAR(30) not null
 );
+
 
 CREATE TABLE tb_idioma_dublagem(
 	idioma_dublagem_id INT PRIMARY KEY AUTO_INCREMENT,
