@@ -1,30 +1,29 @@
 /**********************************************************************
  * Objetivo: Arquivo responsável pela manipulação de dados entre o app
- * e a model para o CRUD de filmes.
- * Data: 28/10/2025
+ * e a model para o CRUD de estudio.
+ * Data: 03/11/2025
  * Developer: Gabriel Lacerda Correia
  * Versão: 1.0.0
  *********************************************************************/
 
-const cargoDAO = require("../../model/DAO/cargo.js")
+const estudioDAO = require("../../model/DAO/estudio.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
-const listarCargos = async () => {
+const listarEstudios = async () => {
 
     const MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
     try {
         
-        const result = await cargoDAO.getSelectAllResponsability()
-
+        const result = await estudioDAO.getSelectAllStudio()
 
         if(result) {
 
             if (result.length > 0) {
 
-                MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
-                MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
-                MESSAGES.DEFAULT_HEADER.items.responsabilitys = result
+                MESSAGES.DEFAULT_HEADER.status                  = MESSAGES.SUCCESS_REQUEST.status
+                MESSAGES.DEFAULT_HEADER.status_code             = MESSAGES.SUCCESS_REQUEST.status_code
+                MESSAGES.DEFAULT_HEADER.items.studios           = result
 
                 return MESSAGES.DEFAULT_HEADER // 200
 
@@ -42,7 +41,7 @@ const listarCargos = async () => {
 
 }
 
-const buscarCargoId = async (id) => {
+const buscarEstudioId = async (id) => {
 
     const MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -50,7 +49,7 @@ const buscarCargoId = async (id) => {
         
         if (!isNaN(id) && id != "" && id != null && id != undefined && id > 0) {
 
-            const result = await cargoDAO.getSelectResponsabilityById(id)
+            const result = await estudioDAO.getSelectStudioById(id)
 
             if(result) {
 
@@ -58,7 +57,7 @@ const buscarCargoId = async (id) => {
 
                     MESSAGES.DEFAULT_HEADER.status               =  MESSAGES.SUCCESS_REQUEST.status
                     MESSAGES.DEFAULT_HEADER.status_code          =  MESSAGES.SUCCESS_REQUEST.status_code
-                    MESSAGES.DEFAULT_HEADER.items.responsability =  result
+                    MESSAGES.DEFAULT_HEADER.items.studio         =  result
 
                     return MESSAGES.DEFAULT_HEADER // 200
 
@@ -80,7 +79,7 @@ const buscarCargoId = async (id) => {
 
 }
 
-const inserirCargo = async (cargo, contentType) => {
+const inserirEstudio = async (estudio, contentType) => {
 
     const MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -88,22 +87,22 @@ const inserirCargo = async (cargo, contentType) => {
 
         if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
 
-            let validar = validarCargo(cargo)
+            let validar = validarEstudio(estudio)
 
             if (!validar) {
 
-                const result = await cargoDAO.setInsertResponsability(cargo)
+                const result = await estudioDAO.setInsertStudio(estudio)
 
                 if (result) {
 
-                    const lastId = await cargoDAO.getSelectLastResponsability()
+                    const lastId = await estudioDAO.getSelectLastStudio()
 
                     if(lastId) {
 
                         MESSAGES.DEFAULT_HEADER.status                          =   MESSAGES.SUCCESS_CREATED_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code                     =   MESSAGES.SUCCESS_CREATED_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message                         =   MESSAGES.SUCCESS_CREATED_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items.responsability_created    =   lastId
+                        MESSAGES.DEFAULT_HEADER.items.studio_created            =   lastId
 
                         return MESSAGES.DEFAULT_HEADER
 
@@ -129,7 +128,7 @@ const inserirCargo = async (cargo, contentType) => {
 
 }
 
-const atualizarCargo = async (id, cargo, contentType) => {
+const atualizarEstudio = async (id, estudio, contentType) => {
 
     const MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -137,15 +136,15 @@ const atualizarCargo = async (id, cargo, contentType) => {
         
         if (String(contentType).toUpperCase() == "APPLICATION/JSON") {
 
-            let validarId = await buscarCargoId(id)
+            let validarId = await buscarEstudioId(id)
 
             if (validarId.status_code == 200) {
 
-                let validar = validarCargo(cargo)
+                let validar = validarEstudio(estudio)
 
                 if (!validar) {
 
-                    const result = await cargoDAO.setUpdateResponsabilityById(id, cargo)
+                    const result = await estudioDAO.setUpdateStudioById(id, estudio)
 
                     if(result) {
 
@@ -178,17 +177,17 @@ const atualizarCargo = async (id, cargo, contentType) => {
 
 }
 
-const excluirCargo = async (id) => {
+const excluirEstudio = async (id) => {
 
     const MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
     try {
 
-        let validarId = await buscarCargoId(id) 
+        let validarId = await buscarEstudioId(id) 
     
         if (validarId.status_code == 200) {
 
-            const result = await cargoDAO.setDeleteResponsabilityById(id)
+            const result = await estudioDAO.setDeleteStudioById(id)
 
             if(result) {
 
@@ -208,17 +207,16 @@ const excluirCargo = async (id) => {
         }
 
     } catch (error) {
-        console.log(error)
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 
 }
 
-const validarCargo = (cargo) => {
+const validarEstudio = (estudio) => {
 
     const MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
-    if (cargo.nome == "" || cargo.nome == undefined || cargo.nome == null || cargo.nome.length > 100) {
+    if (estudio.nome == "" || estudio.nome == undefined || estudio.nome == null || estudio.nome.length > 50) {
 
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [NOME INCORRETO]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
@@ -230,9 +228,9 @@ const validarCargo = (cargo) => {
 }
 
 module.exports = {
-    listarCargos,
-    buscarCargoId,
-    inserirCargo,
-    atualizarCargo,
-    excluirCargo
+    listarEstudios,
+    buscarEstudioId,
+    inserirEstudio,
+    atualizarEstudio,
+    excluirEstudio
 }

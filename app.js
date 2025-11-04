@@ -171,7 +171,7 @@ app.get('/v1/locadora/cargo/:id', cors(), async (req, res) => {
 })
 
 
-app.post('/v1/locadora/cargo', cors(), bodyParserJSON, async(req, res) => {
+app.post('/v1/locadora/cargo', cors(), bodyParserJSON, async (req, res) => {
 
     const dadosBody = req.body
     const contentType = req.headers['content-type']
@@ -263,6 +263,64 @@ app.delete('/v1/locadora/delete/distribuidora/:id', cors(), async (req, res) => 
 
     res.status(deleteDistribuidora.status_code)
     res.json(deleteDistribuidora)
+
+})
+
+const controllerEstudio = require("./src/controller/estudio/controller_estudio.js")
+
+app.get('/v1/locadora/estudio/', cors(), async (req, res) => {
+
+    let estudios = await controllerEstudio.listarEstudios()
+
+    res.status(estudios.status_code)
+    res.json(estudios)
+
+})
+
+app.get('/v1/locadora/estudio/:id', cors(), async (req, res) => {
+
+    const id = req.params.id
+
+    let estudio = await controllerEstudio.buscarEstudioId(id)
+
+    res.status(estudio.status_code)
+    res.json(estudio)
+
+})
+
+app.post('/v1/locadora/estudio/', cors(), bodyParserJSON, async (req, res) => {
+
+    const dadosBody = req.body
+    const contentType = req.headers['content-type']
+
+    let estudio = await controllerEstudio.inserirEstudio(dadosBody, contentType)
+
+    res.status(estudio.status_code)
+    res.json(estudio)
+
+})
+
+app.put('/v1/locadora/estudio/:id', cors(), bodyParserJSON, async (req, res) => {
+
+    const id = req.params.id
+    const dadosBody = req.body
+    const contentType = req.headers['content-type']
+
+    let estudio = await controllerEstudio.atualizarEstudio(id, dadosBody, contentType)
+
+    res.status(estudio.status_code)
+    res.json(estudio)
+
+})
+
+app.delete('/v1/locadora/delete/estudio/:id', cors(), async (req, res) => {
+
+    const id = req.params.id
+
+    let estudio = await controllerEstudio.excluirEstudio(id)
+
+    res.status(estudio.status_code)
+    res.json(estudio)
 
 })
 
