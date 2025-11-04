@@ -60,6 +60,7 @@ const getSelectAllResponsability = async () => {
         const sql = "select * from tb_cargo"
 
         const result = await prisma.$queryRawUnsafe(sql)
+        
 
         if(Array.isArray(result)) {
             return result
@@ -77,7 +78,6 @@ const getSelectAllResponsability = async () => {
 const getSelectResponsabilityById = async (id) => {
 
     try {
-        
         const sql = `select * from tb_cargo where cargo_id = ${id}`
 
         const result = await prisma.$queryRawUnsafe(sql)

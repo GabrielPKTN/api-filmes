@@ -255,7 +255,7 @@ const validarDadosGenero = async (genero) => {
     // Cópia do objeto DEFAULT_MESSAGES
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
-    if (genero.nome_genero == "" || genero.nome_genero == undefined || genero.nome_genero == null || genero.nome_genero.length > 100) {
+    if (genero.nome_genero == "" || genero.nome_genero == undefined || genero.nome_genero == null || genero.nome_genero.length > 30) {
 
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [NOME INCORRETO]'
         return MESSAGES.ERROR_REQUIRED_FIELDS

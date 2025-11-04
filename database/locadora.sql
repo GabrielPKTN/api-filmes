@@ -26,6 +26,7 @@ CREATE TABLE tb_distribuidora(
 	nome_distribuidora VARCHAR(50) not null
 );
 
+-- CRUD FEITO
 CREATE TABLE tb_cargo(
 	cargo_id INT PRIMARY KEY AUTO_INCREMENT,
 	nome_cargo VARCHAR(100) not null

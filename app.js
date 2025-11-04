@@ -148,6 +148,66 @@ app.delete('/v1/locadora/delete/genero/:id', cors(), async (req, res) => {
 
 })
 
+const controllerCargo = require("./src/controller/cargo/controller_cargo.js")
+
+app.get('/v1/locadora/cargo', cors(), async (req, res) => {
+
+    let cargos = await controllerCargo.listarCargos()
+
+    res.status(cargos.status_code)
+    res.json(cargos)
+
+})
+
+app.get('/v1/locadora/cargo/:id', cors(), async (req, res) => {
+
+    const id = req.params.id
+
+    let cargo = await controllerCargo.buscarCargoId(id)
+
+    res.status(cargo.status_code)
+    res.json(cargo)
+
+})
+
+
+app.post('/v1/locadora/cargo', cors(), bodyParserJSON, async(req, res) => {
+
+    const dadosBody = req.body
+    const contentType = req.headers['content-type']
+
+    let cargo = await controllerCargo.inserirCargo(dadosBody, contentType)
+
+    res.status(cargo.status_code)
+    res.json(cargo)
+
+})
+
+app.put('/v1/locadora/cargo/:id', cors(), bodyParserJSON, async (req, res) => {
+
+    const id = req.params.id
+    const dadosBody = req.body
+    const contentType = req.headers['content-type']
+
+    let cargo = await controllerCargo.atualizarCargo(id, dadosBody, contentType)
+
+    res.status(cargo.status_code)
+    res.json(cargo)
+
+})
+
+
+app.delete('/v1/locadora/cargo/:id', cors(), async (req, res) => {
+
+    const id = req.params.id
+
+    let deleteCargo = await controllerCargo.excluirCargo(id)
+
+    res.status(deleteCargo.status_code)
+    res.json(deleteCargo)
+
+})
+
 const controllerDistribuidora = require("./src/controller/distribuidora/controller_distribuidora.js")
 
 app.get('/v1/locadora/distribuidora', cors(), async (req, res) => {

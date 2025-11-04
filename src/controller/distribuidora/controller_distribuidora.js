@@ -216,7 +216,7 @@ const validarDadosDistribuidora = (distribuidora) => {
 
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
     
-    if (distribuidora.nome == "" || distribuidora.nome == undefined || distribuidora.nome == null || distribuidora.nome.length > 100) {
+    if (distribuidora.nome == "" || distribuidora.nome == undefined || distribuidora.nome == null || distribuidora.nome.length > 50) {
     
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [NOME INCORRETO]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
