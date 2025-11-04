@@ -324,6 +324,64 @@ app.delete('/v1/locadora/delete/estudio/:id', cors(), async (req, res) => {
 
 })
 
+const controllerPapel = require('./src/controller/papel/controller_papel.js')
+
+app.get('/v1/locadora/papel/', cors(), async (req, res) => {
+
+    let papeis = await controllerPapel.listarPapeis()
+
+    res.status(papeis.status_code)
+    res.json(papeis)
+
+})
+
+app.get('/v1/locadora/papel/:id', cors(), async (req, res) => {
+
+    const id = req.params.id
+
+    let papel = await controllerPapel.buscarPapelId(id)
+
+    res.status(papel.status_code)
+    res.json(papel)
+
+})
+
+app.post('/v1/locadora/papel/', cors(), bodyParserJSON, async (req, res) => {
+
+    const dadosBody = req.body
+    const contentType = req.headers['content-type']
+
+    let papel = await controllerPapel.inserirPapel(dadosBody, contentType)
+
+    res.status(papel.status_code)
+    res.json(papel)
+
+})
+
+app.put('/v1/locadora/papel/:id', cors(), bodyParserJSON, async (req, res) => {
+
+    const id = req.params.id
+    const dadosBody = req.body
+    const contentType = req.headers['content-type']
+
+    let papel = await controllerPapel.atualizarPapel(id, dadosBody, contentType)
+
+    res.status(papel.status_code)
+    res.json(papel)
+
+})
+
+app.delete('/v1/locadora/delete/papel/:id', cors(), async (req, res) => {
+
+    const id = req.params.id
+
+    let papel = await controllerPapel.excluirPapel(id)
+
+    res.status(papel.status_code)
+    res.json(papel)
+
+})
+
 app.listen(PORT, () => {
     console.log('Está vivo...!!!')
 })

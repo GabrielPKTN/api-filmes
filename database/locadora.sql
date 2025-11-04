@@ -32,6 +32,7 @@ CREATE TABLE tb_cargo(
 	nome_cargo VARCHAR(100) not null
 );
 
+--CRUD FEITO
 CREATE TABLE tb_estudio(
 	estudio_id INT PRIMARY KEY AUTO_INCREMENT,
 	nome_estudio VARCHAR(50) not null
