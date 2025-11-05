@@ -15,7 +15,7 @@ const bodyParser = require('body-parser')    // Responsável por gerenciar a che
 
 const bodyParserJSON = bodyParser.json() // Cria um objeto especialista no formato JSON para receber dados via POST e PUT
 
-router.get('/filmes', cors(), async (req, res) => {
+router.get('/filme', cors(), async (req, res) => {
     let filmes = await controllerFilme.listarFilmes()
     
 

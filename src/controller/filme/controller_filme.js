@@ -3,10 +3,15 @@
  * e a model para o CRUD de filmes.
  * Data: 07/10/2025
  * Developer: Gabriel Lacerda Correia
- * Versão: 1.0.0
+ * Versão: 1.0.0 (CRUD básico do filme, sem as relações com outras tabelas)
+ * Versão: 1.1.0 (CRUD do filme com relacionamento com a tabela genero)
  *********************************************************************/
 
 const filmeDAO = require("../../model/DAO/filme.js")
+
+// Import da controller da relação entre filme e gênero
+const filmeGeneroController = require("./controller_filme_genero.js")
+
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const listarFilmes = async () => {
@@ -102,6 +107,14 @@ const inserirFilme = async (filme, contentType) => {
                     let lastId = await filmeDAO.getSelectLastId()
                     
                     if (lastId) {
+
+                        //Processar a inserção dos dados na tabela de relação 
+                        //entre filme e gênero
+
+                        filme.genero.forEach( async (genero) => {
+                            let filmeGenero = {filme_id: lastId, genero_id: genero.id}
+                            let resultFilmesGenero = await filmeGeneroController.inserirFilmeGenero(filmeGenero) 
+                        })
 
                         //Adiciona o id no json com os dados do filme
                         filme.id = lastId
