@@ -9,6 +9,8 @@
 // Importando dependencias da API
 const express    = require('express')        // Responsável pela API
 const cors       = require('cors')           // Responsável pelas permissões da API (APP)
+const swaggerUi = require('swagger-ui-express')
+const swaggerDocument = require('./swagger.json')
 
 // Retorna a porta do servidor atual ou colocamos uma porta local.
 const PORT = process.PORT || 8000
@@ -43,6 +45,9 @@ app.use('/v1/locadora', distribuidoraRoutes)
 app.use('/v1/locadora', estudioRoutes)
 app.use('/v1/locadora', papelRoutes)
 app.use('/v1/locadora', idiomaDublagemRoutes)
+
+// DOCUMENTAÇÃO SWAGGER!!
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 app.listen(PORT, () => {
     console.log('Está vivo...!!!')
