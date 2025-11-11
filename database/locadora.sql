@@ -1,59 +1,323 @@
-CREATE DATABASE db_locadora_filme_ds2m_25_2;
+create database db_locadora_filme_ds2m_25_2;
 
-USE db_locadora_filme_ds2m_25_2;
+use db_locadora_filme_ds2m_25_2;
 
--- CRUD PARA ATUALIZAR
-CREATE TABLE tb_filmes(
-	filme_id INT PRIMARY KEY AUTO_INCREMENT,
-	nome VARCHAR(100) not null,
-	sinopse TEXT null,
-	data_lancamento DATE null,
-	duracao TIME not null,
-	orcamento DECIMAL(10, 2) not null,
-	trailer VARCHAR(255) null,
-	capa VARCHAR(255) not null
-);
-
--- CRUD FEITO
-CREATE TABLE tb_genero(
-	genero_id INT PRIMARY KEY AUTO_INCREMENT,
-	nome_genero VARCHAR(30) not null
-);
-
--- CRUD FEITO
-CREATE TABLE tb_distribuidora(
-	distribuidora_id INT PRIMARY KEY AUTO_INCREMENT,
-	nome_distribuidora VARCHAR(50) not null
-);
-
--- CRUD FEITO
-CREATE TABLE tb_cargo(
-	cargo_id INT PRIMARY KEY AUTO_INCREMENT,
-	nome_cargo VARCHAR(100) not null
-);
-
---CRUD FEITO
-CREATE TABLE tb_estudio(
-	estudio_id INT PRIMARY KEY AUTO_INCREMENT,
-	nome_estudio VARCHAR(50) not null
-);
-
--- CRUD FEITO
 CREATE TABLE tb_papel(
-	papel_id INT PRIMARY KEY AUTO_INCREMENT,
-	nome_papel VARCHAR(30) not null
+	
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	nome VARCHAR(30) NOT NULL
+	
 );
 
--- CRUD FEITO
-CREATE TABLE tb_idioma_dublagem(
-	idioma_dublagem_id INT PRIMARY KEY AUTO_INCREMENT,
-	idioma_dublador VARCHAR(5) not null
+CREATE TABLE tb_idioma_dublagem (
+	
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	dublagem VARCHAR(5) NOT NULL
+	
 );
 
-CREATE TABLE tb_filme_genero(
-	filme_genero_id INT PRIMARY KEY AUTO_INCREMENT,
-	filme_id INT,
-	genero_id INT,
-	FOREIGN KEY (filme_id) REFERENCES tb_filmes(filme_id),
-	FOREIGN KEY (genero_id) REFERENCES tb_genero(genero_id)
+CREATE TABLE tb_estudio (
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	nome VARCHAR(50) NOT NULL
+
 );
+
+CREATE TABLE tb_distribuidora (
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	nome VARCHAR(50) NOT NULL
+
+);
+
+CREATE TABLE  tb_genero (
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	nome VARCHAR(30) NOT NULL
+
+);
+
+CREATE TABLE tb_cargo (
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	nome VARCHAR(100) NOT NULL
+	
+);
+
+CREATE TABLE tb_personagem (
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	nome VARCHAR(100) NOT NULL,
+	descricao TEXT NULL,
+	foto VARCHAR(255) NULL,
+	papel_id INT NOT NULL,
+	
+	CONSTRAINT FK_PAPEL_PAPEL_PERSONAGEM
+	FOREIGN KEY (papel_id)
+	REFERENCES tb_papel(id)
+
+);
+
+CREATE TABLE tb_ator (
+	
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	nome VARCHAR(100) NOT NULL,
+	idade INT NULL,
+	foto VARCHAR(255) NULL
+	
+);
+
+CREATE TABLE tb_ator_personagem(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	ator_id INT NOT NULL,
+	personagem_id INT NOT NULL,
+	
+	CONSTRAINT FK_ATOR_ATOR_ATOR_PERSONAGEM
+	FOREIGN KEY (ator_id)
+	REFERENCES tb_ator(id),
+	
+	CONSTRAINT FK_PERSONAGEM_PERSONAGEM_ATOR_PERSONAGEM
+	FOREIGN KEY (personagem_id)
+	REFERENCES tb_personagem(id)
+
+);
+
+ALTER TABLE tb_ator 
+ADD COLUMN ator_personagem_id INT NOT NULL;
+
+ALTER TABLE tb_ator
+ADD CONSTRAINT FK_ATOR_PERSONAGEM_ATOR_PERSONAGEM_ATOR 
+FOREIGN KEY (ator_personagem_id)
+REFERENCES tb_ator_personagem(id);
+
+CREATE TABLE tb_dublador(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	nome VARCHAR(100) NOT NULL,
+	foto VARCHAR(255) NULL
+
+);
+
+CREATE TABLE tb_ator_dublador(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	ator_id INT NOT NULL,
+	dublador_id INT NOT NULL,
+	
+	CONSTRAINT FK_ATOR_ATOR_ATOR_DUBLADOR
+	FOREIGN KEY (ator_id)
+	REFERENCES tb_ator(id),
+	
+	CONSTRAINT FK_DUBLADOR_DUBLADOR_ATOR_DUBLADOR
+	FOREIGN KEY (dublador_id)
+	REFERENCES tb_dublador(id)
+
+);
+
+ALTER TABLE tb_ator
+ADD COLUMN ator_dublador_id INT NOT NULL;
+
+ALTER TABLE tb_ator
+ADD CONSTRAINT FK_ATOR_DUBLADOR_ATOR_DUBLADOR_ATOR
+FOREIGN KEY (ator_dublador_id)
+REFERENCES tb_ator_dublador(id);
+
+CREATE TABLE tb_dublador_idioma_dublagem(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	dublador_id INT NOT NULL,
+	idioma_dublagem_id INT NOT NULL,
+	
+	
+	CONSTRAINT FK_DUBLADOR_DUBLADOR_DUBLADOR_IDIOMA_DUBLAGEM
+	FOREIGN KEY (dublador_id)
+	REFERENCES tb_dublador(id),
+	
+	CONSTRAINT FK_IDIOMA_DUBLAGEM_IDIOMA_DUBLAGEM_DUBLADOR_IDIOMA_DUBLAGEM
+	FOREIGN KEY (idioma_dublagem_id)
+	REFERENCES tb_idioma_dublagem(id)
+	
+
+);
+
+ALTER TABLE tb_dublador
+ADD COLUMN dublador_idioma_dublagem_id INT NOT NULL;
+
+ALTER TABLE tb_dublador
+ADD CONSTRAINT FK_DUBLADOR_IDIOMA_DUBLAGEM_DUBLADOR_IDIOMA_DUBLAGEM_DUBLADOR
+FOREIGN KEY (dublador_idioma_dublagem_id)
+REFERENCES tb_dublador_idioma_dublagem(id);
+
+CREATE TABLE tb_elenco_ator(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	ator_id INT NOT NULL,
+	
+	CONSTRAINT FK_ATOR_ATOR_ELENCO_ATOR
+	FOREIGN KEY (ator_id)
+	REFERENCES tb_ator(id)
+
+);
+
+CREATE TABLE tb_elenco(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	elenco_ator_id INT NOT NULL,
+	
+	CONSTRAINT FK_ELENCO_ATOR_ELENCO_ATOR_ELENCO
+	FOREIGN KEY (elenco_ator_id)
+	REFERENCES tb_elenco_ator(id)
+
+);
+
+ALTER TABLE tb_elenco_ator
+ADD COLUMN elenco_id INT NOT NULL;
+
+ALTER TABLE tb_elenco_ator
+ADD CONSTRAINT FK_ELENCO_ELENCO_ELENCO_ATOR
+FOREIGN KEY (elenco_id)
+REFERENCES tb_elenco(id);
+
+CREATE TABLE tb_filme(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	titulo VARCHAR(100) NOT NULL,
+	sinopse TEXT NOT NULL,
+	data_lancamento DATE NULL,
+	duracao TIME NOT NULL,
+	orcamento DECIMAL(10, 2) NOT NULL,
+	trailer VARCHAR(255) NULL,
+	capa VARCHAR(255) NOT NULL,
+	elenco_id INT NOT NULL,
+
+	CONSTRAINT FK_ELENCO_ELENCO_FILME
+	FOREIGN KEY (elenco_id)
+	REFERENCES tb_elenco(id)
+
+);
+
+CREATE TABLE tb_profissional(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	nome VARCHAR(100) NOT NULL,
+	idade INT NULL,
+	foto VARCHAR(255) NULL,
+	biografia TEXT NULL,
+	cargo_id INT NOT NULL,
+	
+	CONSTRAINT FK_CARGO_CARGO_PROFISSIONAL
+	FOREIGN KEY (cargo_id)
+	REFERENCES tb_cargo(id)
+
+);
+
+CREATE TABLE tb_profissional_equipe(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	profissional_id INT NOT NULL,
+	
+	CONSTRAINT FK_PROFISSIONAL_PROFISSIONAL_PROFISSIONAL_EQUIPE
+	FOREIGN KEY (profissional_id)
+	REFERENCES tb_profissional(id)
+
+);
+
+CREATE TABLE tb_equipe_tecnica(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	profissional_equipe_id INT NOT NULL,
+	
+	CONSTRAINT FK_PROFISSIONAL_EQUIPE_PROFISSIONAL_EQUIPE_EQUIPE_TECNICA
+	FOREIGN KEY (profissional_equipe_id)
+	REFERENCES tb_profissional_equipe(id)
+
+);
+
+ALTER TABLE tb_profissional_equipe
+ADD COLUMN equipe_tecnica_id INT NOT NULL;
+
+ALTER TABLE tb_profissional_equipe
+ADD CONSTRAINT FK_EQUIPE_TECNICA_EQUIPE_TECNICA_PROFISSIONAL_EQUIPE
+FOREIGN KEY (equipe_tecnica_id)
+REFERENCES tb_equipe_tecnica(id);
+
+ALTER TABLE tb_filme
+ADD COLUMN equipe_tecnica_id INT NOT NULL;
+
+ALTER TABLE tb_filme
+ADD CONSTRAINT FK_EQUIPE_TECNICA_EQUIPE_TECNICA_FILME
+FOREIGN KEY (equipe_tecnica_id)
+REFERENCES tb_equipe_tecnica(id);
+
+CREATE TABLE tb_genero_filme(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	genero_id INT NOT NULL,
+	filme_id INT NOT NULL,
+	
+	CONSTRAINT FK_GENERO_GENERO_GENERO_FILME
+	FOREIGN KEY (genero_id)
+	REFERENCES tb_genero(id),
+	
+	CONSTRAINT FK_FILME_FILME_GENERO_FILME
+	FOREIGN KEY (filme_id)
+	REFERENCES tb_filme(id)
+
+);
+
+ALTER TABLE tb_filme
+ADD COLUMN genero_filme_id INT NOT NULL;
+
+ALTER TABLE tb_filme
+ADD CONSTRAINT FK_GENERO_FILME_GENERO_FILME_FILME
+FOREIGN KEY (genero_filme_id)
+REFERENCES tb_genero_filme(id);
+
+CREATE TABLE tb_distribuidora_filme(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	distribuidora_id INT NOT NULL,
+	filme_id INT NOT NULL,
+	
+	CONSTRAINT FK_DISTRIBUIDORA_DISTRIBUIDORA_DISTRIBUIDORA_FILME
+	FOREIGN KEY (distribuidora_id)
+	REFERENCES tb_distribuidora(id),
+	
+	CONSTRAINT FK_FILME_FILME_DISTRIBUIDORA_FILME
+	FOREIGN KEY (filme_id)
+	REFERENCES tb_filme(id)
+
+);
+
+ALTER TABLE tb_filme
+ADD COLUMN distribuidora_filme_id INT NOT NULL;
+
+ALTER TABLE tb_filme
+ADD CONSTRAINT FK_DISTRIBUIDORA_FILME_DISTRIBUIDORA_FILME_FILME
+FOREIGN KEY (distribuidora_filme_id)
+REFERENCES tb_distribuidora_filme(id);
+
+CREATE TABLE tb_estudio_filme(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	estudio_id INT NOT NULL,
+	filme_id INT NOT NULL,
+	
+	CONSTRAINT FK_ESTUDIO_ESTUDIO_ESTUDIO_FILME
+	FOREIGN KEY (estudio_id)
+	REFERENCES tb_estudio(id),
+	
+	CONSTRAINT FK_FILME_FILME_ESTUDIO_FILME
+	FOREIGN KEY (filme_id)
+	REFERENCES tb_filme(id)
+
+);
+
+ALTER TABLE tb_filme
+ADD COLUMN estudio_filme_id INT NOT NULL;
+
+ALTER TABLE tb_filme
+ADD CONSTRAINT FK_ESTUDIO_FILME_ESTUDIO_FILME_FILME
+FOREIGN KEY (estudio_filme_id)
+REFERENCES tb_estudio_filme(id);
