@@ -15,22 +15,31 @@ const filmeGeneroController = require("./controller_filme_genero.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const listarFilmes = async () => {
-    try {
+    
+    // Cópia do objeto DEFAULT_MESSAGES
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
-        // Cópia do objeto DEFAULT_MESSAGES
-        let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+    try {
 
         //Chama a função de DAO para retornar a listas de filmes
         let resultFilmes = await filmeDAO.getSelectAllFilms()
 
         if (resultFilmes) {
             if (resultFilmes.length > 0) {
+
                 MESSAGES.DEFAULT_HEADER.status = DEFAULT_MESSAGES.SUCCESS_REQUEST.status
                 MESSAGES.DEFAULT_HEADER.status_code = DEFAULT_MESSAGES.SUCCESS_REQUEST.status_code
-                MESSAGES.DEFAULT_HEADER.items.filme = resultFilmes
-
+                
+                for (let filme of resultFilmes) {
+                    
+                    filme.genero = filmeGeneroController.listarGenerosFilmeId(filme.filme_id)
+                    
+                }
+                
+                MESSAGES.DEFAULT_HEADER.items.filme = resultFilmes    
 
                 return MESSAGES.DEFAULT_HEADER //200
+
             } else {
                 return MESSAGES.ERROR_NOT_FOUND //404
             }
@@ -105,24 +114,42 @@ const inserirFilme = async (filme, contentType) => {
                 if (resultFilme) {
                     //Chama a função para receber o id gerado no banco de dados
                     let lastId = await filmeDAO.getSelectLastId()
-                    
+
                     if (lastId) {
 
                         //Processar a inserção dos dados na tabela de relação 
                         //entre filme e gênero
 
-                        filme.genero.forEach( async (genero) => {
+                        //filme.genero.forEach( async (genero) => {
+                        for (genero of filme.genero) {
+                            // Cria o json com o id do filme, e o id do genero.
                             let filmeGenero = {filme_id: lastId, genero_id: genero.id}
-                            let resultFilmesGenero = await filmeGeneroController.inserirFilmeGenero(filmeGenero) 
-                        })
+                            
+                            //Encaminha JSON com o id do filme, e o id do genero para a controller filme_genero.
+                            let resultFilmesGenero = await filmeGeneroController.inserirFilmeGenero(filmeGenero, contentType)
+                            
+                            if(resultFilmesGenero.status_code != 201) {
+                                return MESSAGES.ERROR_RELATINAL_INSERTION // 500 Problema na tabela de relação
+                            }
+                        }
 
                         //Adiciona o id no json com os dados do filme
-                        filme.id = lastId
 
                         MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items = filme
+                        
+                        //Adicionar no JSON dados do genero
+
+                        //deleta o atributo genero de filme
+                        delete filme.genero
+                        // Pesquisa no banco de dados todos os generos atribuidos ao filme
+                        let result = await filmeGeneroController.listarGenerosFilmeId(lastId)
+
+                        // Cria novamento o atributo genero mas agora com id e nome.
+                        filme.genero = result.items.genres
+
+                        MESSAGES.DEFAULT_HEADER.items = {id:lastId, filme}
 
                         return MESSAGES.DEFAULT_HEADER //201
 
@@ -145,7 +172,7 @@ const inserirFilme = async (filme, contentType) => {
         }
 
     } catch (error) {
-
+        
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
 
     }

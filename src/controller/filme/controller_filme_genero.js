@@ -93,7 +93,6 @@ const buscarFilmeGeneroId = async (id) => {
 
 const listarGenerosFilmeId = async (filme_id) => {
 
-
     // Cópia do objeto DEFAULT_MESSAGES
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -130,7 +129,6 @@ const listarGenerosFilmeId = async (filme_id) => {
         }
 
     } catch (error) {
-
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
 
     }
@@ -204,12 +202,12 @@ const inserirFilmeGenero = async (filmeGenero, contentType) => {
                     let lastId = await filmeGeneroDAO.getSelectLastId()
 
                     if (lastId) {
-
-                        filme_genero.id = lastId
+                        
+                        filmeGenero.id = lastId.filme_genero_id
                         MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items.created_film_genre = filme_genero
+                        MESSAGES.DEFAULT_HEADER.items.created_film_genre = filmeGenero
 
                         return MESSAGES.DEFAULT_HEADER
 
@@ -238,7 +236,6 @@ const inserirFilmeGenero = async (filmeGenero, contentType) => {
 
     } catch (error) {
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER
-
     }
 
 }
