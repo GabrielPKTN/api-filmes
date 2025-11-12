@@ -118,7 +118,6 @@ const listarGenerosFilmeId = async (filme_id) => {
                 }
 
             } else {
-
                 return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
             }
 

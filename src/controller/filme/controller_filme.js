@@ -32,7 +32,11 @@ const listarFilmes = async () => {
                 
                 for (let filme of resultFilmes) {
                     
-                    filme.genero = filmeGeneroController.listarGenerosFilmeId(filme.filme_id)
+                    let result = await filmeGeneroController.listarGenerosFilmeId(filme.filme_id)
+
+                    if (result.status_code == 200) {
+                        filme.genero = result
+                    }
                     
                 }
                 
@@ -69,6 +73,18 @@ const buscarFilmeId = async (id) => {
 
                     MESSAGES.DEFAULT_HEADER.status = DEFAULT_MESSAGES.SUCCESS_REQUEST.status
                     MESSAGES.DEFAULT_HEADER.status_code = DEFAULT_MESSAGES.SUCCESS_REQUEST.status_code
+                
+                    for (let filme of resultFilme) {
+
+                        filmeId = filme.filme_id
+                        generos = await filmeGeneroController.listarGenerosFilmeId(filmeId)
+
+                        if (generos.status_code == 200) {
+                            filme.genero = generos.items.genres
+                        }
+
+                    }
+
                     MESSAGES.DEFAULT_HEADER.items.filme = resultFilme
 
                     return MESSAGES.DEFAULT_HEADER //200
@@ -86,6 +102,7 @@ const buscarFilmeId = async (id) => {
         }
 
     } catch (error) {
+        console.log(error)
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 

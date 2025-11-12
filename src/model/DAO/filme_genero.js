@@ -86,9 +86,8 @@ const getSelectGenresByIdFilms = async (filmId) => {
     try {
         
         const sql = `select
-                        f.nome as nome_filme,
-                        g.id,
-                        g.nome
+                        g.genero_id,
+                        g.nome_genero
                         from tb_filme_genero fg
                             
                             join tb_filmes f 
@@ -97,10 +96,10 @@ const getSelectGenresByIdFilms = async (filmId) => {
                             join tb_genero g 
                                 on g.genero_id = fg.genero_id
 
-                        where f.filme_id = ${filmeId}`
+                        where f.filme_id = ${filmId}`
         
         result = await prisma.$queryRawUnsafe(sql)
-
+        
         if (Array.isArray(result)) {
                             
             return result
