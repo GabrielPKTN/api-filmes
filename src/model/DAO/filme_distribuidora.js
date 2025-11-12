@@ -1,7 +1,7 @@
 /**********************************************************************
  * Objetivo: Arquivo responsável pelo CRUD da tabela no MySQL, referente
- * ao relacionamento entre filme, e genero
- * Data: 05/11/2025
+ * ao relacionamento entre filme, e distribuidora
+ * Data: 12/11/2025
  * Developer: Gabriel Lacerda Correia
  * Versão: 1.0.0
  *********************************************************************/
@@ -26,12 +26,12 @@ const prisma = new PrismaClient()
     //variável e que não retorna dados do banco (INSERT, UPDATE e DELETE)
     //e executa tratamentos com segurança
 
-// Retorna todos os filmes e generos da tabela
-const getSelectAllFilmsGenres = async () => {
+// Retorna todos os filmes e distribuidoras da tabela
+const getSelectAllFilmsDistributor = async () => {
 
     try {
 
-        sql = "select * from tb_filme_genero"
+        sql = "select * from tb_filme_distribuidora"
 
         result = await prisma.$queryRawUnsafe(sql)
 
@@ -53,12 +53,12 @@ const getSelectAllFilmsGenres = async () => {
     
 }
 
-// Retorna o filme com genero pelo id
-const getSelectFilmsGenresById = async (id) => {
+// Retorna o filme com a distribuidora pelo id
+const getSelectFilmsDistributorsById = async (id) => {
 
     try {
         
-        sql = `select * from tb_filme_genero where filme_genero_id = ${id}`
+        sql = `select * from tb_filme_distribuidora where id = ${id}`
 
         result = await prisma.$queryRawUnsafe(sql)
 
@@ -80,23 +80,24 @@ const getSelectFilmsGenresById = async (id) => {
 
 }
 
-// Retorna o retorna um lista de generos filtrando pelo id do filme
-const getSelectGenresByIdFilms = async (filmId) => {
+// Retorna o retorna um lista de distribuidoras filtrando pelo id do filme
+const getSelectDistributorsByIdFilms = async (filmId) => {
 
     try {
         
         const sql = `select
-                        g.genero_id,
-                        g.nome_genero
-                        from tb_filme_genero fg
+		            tb_distribuidora.id,
+		            tb_distribuidora.nome
+
+		            from tb_filme_distribuidora
                             
-                            join tb_filmes f 
-                                on f.filme_id = fg.filme_id
+			            join tb_filme on
+                            tb_filme.id = tb_filme_distribuidora.filme_id
 
-                            join tb_genero g 
-                                on g.genero_id = fg.genero_id
+			            join tb_distribuidora on
+				            tb_distribuidora.id = tb_filme_distribuidora.distribuidora_id
 
-                        where f.filme_id = ${filmId}`
+			            where tb_filme.id = ${filmId}`
         
         result = await prisma.$queryRawUnsafe(sql)
         
@@ -116,23 +117,23 @@ const getSelectGenresByIdFilms = async (filmId) => {
 
 }
 
-// Retorna o retorna um lista de filmes filtrando pelo id do genero
-const getSelectFilmsByIdGenres = async (genreId) => {
+// Retorna uma lista de filmes filtrando pelo id da distribuidora
+const getSelectFilmsByIdDistributors = async (distributorId) => {
 
     try {
         const sql = `select
-                        g.nome_genero as genero,
-                        f.filme_id,
-                        f.nome
-                        from tb_filme_genero fg
+		            tb_filme.id,
+		            tb_filme.titulo
+
+		            from tb_filme_distribuidora
                             
-                            join tb_filmes f 
-                                on f.filme_id = fg.filme_id
+			            join tb_filme on
+                            tb_filme.id = tb_filme_distribuidora.filme_id
 
-                            join tb_genero g 
-                                on g.genero_id = fg.genero_id
+			            join tb_distribuidora on
+				            tb_distribuidora.id = tb_filme_distribuidora.distribuidora_id
 
-                        where g.genero_id = ${genreId}`
+			            where tb_distribuidora.id = ${distributorId}`
 
         result = await prisma.$queryRawUnsafe(sql)
 
@@ -153,12 +154,12 @@ const getSelectFilmsByIdGenres = async (genreId) => {
     
 }
 
-// Retorna o último id de genero registrado na tabela
+// Retorna o último id de filme com distribuidora registrado na tabela
 const getSelectLastId = async () => {
 
     try {
         
-        sql = 'select * from tb_filme_genero order by filme_genero_id desc limit 1'
+        sql = 'select * from tb_filme_distribuidora order by id desc limit 1'
 
         result = await prisma.$queryRawUnsafe(sql)
 
@@ -181,14 +182,14 @@ const getSelectLastId = async () => {
 }
 
 // Registra um gênero na tabela
-const setInsertFilmsGenres = async (filmGenre) => {
+const setInsertFilmsDistributors = async (filmDistributor) => {
     
     try {
         
-        sql = `INSERT INTO tb_filme_genero(filme_id, genero_id) 
+        sql = `INSERT INTO tb_filme_distribuidora(id_distribuidora, id_filme) 
             VALUES (
-                '${filmGenre.filme_id}',
-                '${filmGenre.genero_id}'
+                '${filmDistributor.id_filme}',
+                '${filmDistributor.id_distribuidora}'
             );`
 
         result = await prisma.$executeRawUnsafe(sql)
@@ -212,17 +213,17 @@ const setInsertFilmsGenres = async (filmGenre) => {
 
 }
 
-// Atualiza o registro de um gênero na tabela pelo id
-const setUpdateFilmsGenres = async (filmGenre) => {
+// Atualiza o registro de um filme com distribuidora na tabela pelo id
+const setUpdateFilmsDistributors = async (filmDistributor) => {
 
     try {
         
-        let sql =  `update tb_filme_genero set  
+        let sql =  `update tb_filme_distribuidora set  
                     
-                    filme_id = '${filmGenre.filme_id}',
-                    genero_id = '${filmGenre.genero_id}
+                    id_filme = '${filmDistributor.id_filme}',
+                    id_distribuidora = '${filmDistributor.id_distribuidora}
 
-                    where filme_genero_id  = ${filmGenre.id}`
+                    where filme_distribuidora_id  = ${filmDistributor.id}`
 
         let result = await prisma.$executeRawUnsafe(sql)
 
@@ -240,12 +241,12 @@ const setUpdateFilmsGenres = async (filmGenre) => {
 
 }
 
-// Deleta um registro da tabela gênero pelo id
-const setDeleteFilmsGenres = async (id) => {
+// Deleta um registro da tabela filme_distribuidora pelo id
+const setDeleteFilmsDistributors = async (id) => {
 
     try {
 
-        let sql = `delete from tb_filme_genero where filme_genero_id = ${id}`
+        let sql = `delete from tb_filme_distribuidora where id = ${id}`
 
         let result = prisma.$executeRawUnsafe(sql)
 
@@ -262,12 +263,14 @@ const setDeleteFilmsGenres = async (id) => {
 }
 
 module.exports = {
-    getSelectAllFilmsGenres,
-    getSelectFilmsGenresById,
-    getSelectFilmsByIdGenres,
-    getSelectGenresByIdFilms,
+
+    getSelectAllFilmsDistributor,
+    getSelectFilmsDistributorsById,
+    getSelectDistributorsByIdFilms,
+    getSelectFilmsByIdDistributors,
     getSelectLastId,
-    setInsertFilmsGenres,
-    setUpdateFilmsGenres,
-    setDeleteFilmsGenres
+    setInsertFilmsDistributors,
+    setUpdateFilmsDistributors,
+    setDeleteFilmsDistributors
+    
 }
