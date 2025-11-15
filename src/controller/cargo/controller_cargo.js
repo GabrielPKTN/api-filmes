@@ -15,16 +15,16 @@ const listarCargos = async () => {
 
     try {
         
-        const result = await cargoDAO.getSelectAllResponsability()
+        const resultCargos = await cargoDAO.getSelectAllRole()
 
 
-        if(result) {
+        if(resultCargos) {
 
-            if (result.length > 0) {
+            if (resultCargos.length > 0) {
 
                 MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
                 MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
-                MESSAGES.DEFAULT_HEADER.items.responsabilitys = result
+                MESSAGES.DEFAULT_HEADER.items.roles = resultCargos
 
                 return MESSAGES.DEFAULT_HEADER // 200
 
@@ -50,7 +50,7 @@ const buscarCargoId = async (id) => {
         
         if (!isNaN(id) && id != "" && id != null && id != undefined && id > 0) {
 
-            const result = await cargoDAO.getSelectResponsabilityById(id)
+            const result = await cargoDAO.getSelectRoleById(id)
 
             if(result) {
 
@@ -58,7 +58,7 @@ const buscarCargoId = async (id) => {
 
                     MESSAGES.DEFAULT_HEADER.status               =  MESSAGES.SUCCESS_REQUEST.status
                     MESSAGES.DEFAULT_HEADER.status_code          =  MESSAGES.SUCCESS_REQUEST.status_code
-                    MESSAGES.DEFAULT_HEADER.items.responsability =  result
+                    MESSAGES.DEFAULT_HEADER.items.role           =  result
 
                     return MESSAGES.DEFAULT_HEADER // 200
 
@@ -92,20 +92,20 @@ const inserirCargo = async (cargo, contentType) => {
 
             if (!validar) {
 
-                const result = await cargoDAO.setInsertResponsability(cargo)
+                const resultCargos = await cargoDAO.setInsertRole(cargo)
 
-                if (result) {
+                if (resultCargos) {
 
-                    const lastId = await cargoDAO.getSelectLastResponsability()
+                    const lastId = await cargoDAO.getSelectLastRole()
 
                     if(lastId) {
 
                         MESSAGES.DEFAULT_HEADER.status                          =   MESSAGES.SUCCESS_CREATED_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code                     =   MESSAGES.SUCCESS_CREATED_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message                         =   MESSAGES.SUCCESS_CREATED_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items.responsability_created    =   lastId
+                        MESSAGES.DEFAULT_HEADER.items.role_created              =   lastId
 
-                        return MESSAGES.DEFAULT_HEADER
+                        return MESSAGES.DEFAULT_HEADER //201
 
                     } else {
                         return MESSAGES.ERROR_INTERNAL_SERVER_MODEL // 500
@@ -145,13 +145,14 @@ const atualizarCargo = async (id, cargo, contentType) => {
 
                 if (!validar) {
 
-                    const result = await cargoDAO.setUpdateResponsabilityById(id, cargo)
+                    const resultCargo = await cargoDAO.setUpdateRoleById(id, cargo)
 
-                    if(result) {
+                    if(resultCargo) {
 
                         MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_UPDATE_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message             = MESSAGES.SUCCESS_UPDATE_ITEM.message
+                        
                         delete MESSAGES.DEFAULT_HEADER.items
                         
                         return MESSAGES.DEFAULT_HEADER // 200
@@ -188,16 +189,16 @@ const excluirCargo = async (id) => {
     
         if (validarId.status_code == 200) {
 
-            const result = await cargoDAO.setDeleteResponsabilityById(id)
+            const resultCargo = await cargoDAO.setDeleteRoleById(id)
 
-            if(result) {
+            if(resultCargo) {
 
                 MESSAGES.DEFAULT_HEADER.status          = MESSAGES.SUCCESS_DELETE.status
                 MESSAGES.DEFAULT_HEADER.status_code     = MESSAGES.SUCCESS_DELETE.status_code
                 MESSAGES.DEFAULT_HEADER.message         = MESSAGES.SUCCESS_DELETE.message
                 delete MESSAGES.DEFAULT_HEADER.items
 
-                return MESSAGES.DEFAULT_HEADER
+                return MESSAGES.DEFAULT_HEADER // 201
 
             } else {
                 return MESSAGES.ERROR_INTERNAL_SERVER_MODEL // 500

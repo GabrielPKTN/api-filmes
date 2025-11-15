@@ -53,14 +53,13 @@ const prisma = new PrismaClient()
     //e executa tratamentos com segurança
 
 // Retorna todos os cargos
-const getSelectAllResponsability = async () => {
+const getSelectAllRole = async () => {
 
     try {
     
         const sql = "select * from tb_cargo"
 
         const result = await prisma.$queryRawUnsafe(sql)
-        
 
         if(Array.isArray(result)) {
             return result
@@ -75,10 +74,10 @@ const getSelectAllResponsability = async () => {
 }
 
 // Retorna o cargo pelo id
-const getSelectResponsabilityById = async (id) => {
+const getSelectRoleById = async (id) => {
 
     try {
-        const sql = `select * from tb_cargo where cargo_id = ${id}`
+        const sql = `select * from tb_cargo where id = ${id}`
 
         const result = await prisma.$queryRawUnsafe(sql)
 
@@ -95,11 +94,11 @@ const getSelectResponsabilityById = async (id) => {
 }
 
 // Retorna o último item registrado dentro da tabela cargo
-const getSelectLastResponsability = async () => {
+const getSelectLastRole = async () => {
 
     try {
 
-        const sql = `select * from tb_cargo order by cargo_id desc limit 1`
+        const sql = `select * from tb_cargo order by id desc limit 1`
 
         const result = await prisma.$queryRawUnsafe(sql)
 
@@ -116,11 +115,11 @@ const getSelectLastResponsability = async () => {
 }
 
 // Registra um cargo na tabela
-const setInsertResponsability = async (responsability) => {
+const setInsertRole = async (role) => {
 
     try {
         
-        const sql = `insert into tb_cargo( nome_cargo ) values ( '${responsability.nome}' )`
+        const sql = `insert into tb_cargo( nome ) values ( '${role.nome}' )`
 
         const result = await prisma.$executeRawUnsafe(sql)
 
@@ -137,14 +136,14 @@ const setInsertResponsability = async (responsability) => {
 }
 
 // Atualiza um registro dentro da tabela cargo
-const setUpdateResponsabilityById = async (id, responsability) => {
+const setUpdateRoleById = async (id, role) => {
 
     try {
         
-        const sql = `update tb_cargo set nome_cargo = "${responsability.nome}" where cargo_id = ${id}`
+        const sql = `update tb_cargo set nome = "${role.nome}" where id = ${id}`
 
         const result = await prisma.$executeRawUnsafe(sql)
-
+        
         if (result) {
             return result
         } else {
@@ -158,11 +157,11 @@ const setUpdateResponsabilityById = async (id, responsability) => {
 }
 
 // Deleta um registro dentro da tabela cargo
-const setDeleteResponsabilityById = async (id) => {
+const setDeleteRoleById = async (id) => {
 
     try {
         
-        const sql = `delete from tb_cargo where cargo_id = ${id}`
+        const sql = `delete from tb_cargo where id = ${id}`
 
         const result = await prisma.$executeRawUnsafe(sql)
 
@@ -178,24 +177,24 @@ const setDeleteResponsabilityById = async (id) => {
 
 }
 
-// getSelectAllResponsability()
-// getSelectResponsabilityById(3)
-// getSelectLastResponsability()
+// getSelectAllRole()
+// getSelectRoleById(3)
 
 // id_teste = 5
-// responsability_teste = {
-//     "nome": "teste_delete"
+// role_teste = {
+//     "nome": "Best Boy"
 // }
 
-// setInsertResponsability(responsability_teste)
-// setUpdateResponsabilityById(id_teste, responsability_teste)
-// setDeleteResponsabilityById(id_teste)
+// setInsertRole(role_teste)
+// getSelectLastRole()
+// setUpdateRoleById(id_teste, role_teste)
+// setDeleteRoleById(23)
 
 module.exports = {
-    getSelectAllResponsability,
-    getSelectResponsabilityById,
-    getSelectLastResponsability,
-    setInsertResponsability,
-    setUpdateResponsabilityById,
-    setDeleteResponsabilityById
+    getSelectAllRole,
+    getSelectRoleById,
+    getSelectLastRole,
+    setInsertRole,
+    setUpdateRoleById,
+    setDeleteRoleById
 }
