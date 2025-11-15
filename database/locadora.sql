@@ -35,6 +35,22 @@ CREATE TABLE tb_profissional(
 	
 );
 
+CREATE TABLE tb_profissional_cargo(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	id_profissional INT NOT NULL,
+	id_cargo INT NOT NULL,
+	
+	CONSTRAINT FK_PROFISSIONAL_PROFISSIONAL_CARGO
+	FOREIGN KEY (id_profissional)
+	REFERENCES tb_profissional(id),
+	
+	CONSTRAINT FK_CARGO_PROFISSIONAL_CARGOs
+	FOREIGN KEY (id_cargo)
+	REFERENCES tb_cargo(id)
+
+);
+
 CREATE TABLE tb_profissional_equipe(
 
 	id INT PRIMARY KEY AUTO_INCREMENT,
