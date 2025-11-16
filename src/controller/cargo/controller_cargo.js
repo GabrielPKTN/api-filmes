@@ -6,7 +6,7 @@
  * Versão: 1.0.0
  *********************************************************************/
 
-const cargoDAO = require("../../model/DAO/cargo.js")
+const cargoDAO = require("../../model/DAO/cargo-dao/cargo.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const listarCargos = async () => {

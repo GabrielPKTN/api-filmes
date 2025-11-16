@@ -6,7 +6,7 @@
  * Versão: 1.0.0
  *********************************************************************/
 
-const filmeDistribuidoraDAO = require("../../model/DAO/filme_distribuidora.js")
+const filmeDistribuidoraDAO = require("../../model/DAO/filme-dao/filme_distribuidora.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const listarFilmesDistribuidoras = async () => {

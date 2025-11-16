@@ -6,7 +6,7 @@
  * Versão: 1.0.0
  *********************************************************************/
 
-const idiomaDAO = require("../../model/DAO/idioma_dublagem.js")
+const idiomaDAO = require("../../model/DAO/idioma-dao/idioma_dublagem.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const listarIdiomas = async () => {

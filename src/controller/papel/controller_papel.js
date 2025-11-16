@@ -6,7 +6,7 @@
  * Versão: 1.0.0
  *********************************************************************/
 
-const papelDAO = require("../../model/DAO/papel.js")
+const papelDAO = require("../../model/DAO/papel-dao/papel.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const listarPapeis = async () => {

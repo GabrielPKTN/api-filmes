@@ -7,7 +7,7 @@
  * Versão: 1.1.0 (CRUD do filme com relacionamento com a tabela genero)
  *********************************************************************/
 
-const filmeDAO = require("../../model/DAO/filme.js")
+const filmeDAO = require("../../model/DAO/filme-dao/filme.js")
 
 // Import da controller da relação entre filme e gênero
 const filmeGeneroController = require("./controller_filme_genero.js")

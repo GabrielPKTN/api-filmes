@@ -1,7 +1,7 @@
 /**********************************************************************
  * Objetivo: Arquivo responsável pelo CRUD da tabela no MySQL, referente
- * ao estudio
- * Data: 03/11/2025
+ * ao filme
+ * Data: 01/10/2025
  * Developer: Gabriel Lacerda Correia
  * Versão: 1.0.0
  *********************************************************************/
@@ -33,7 +33,7 @@
  ********************************************************************/
 
 //Import da dependência do prisma que permite a execução do de script SQL no BD 
-const {PrismaClient} = require('../../generated/prisma') 
+const {PrismaClient} = require('../../../generated/prisma') 
 
 //Cria um novo objeto baseado na classe PrismaClient
 const prisma = new PrismaClient()
@@ -52,122 +52,151 @@ const prisma = new PrismaClient()
     //variável e que não retorna dados do banco (INSERT, UPDATE e DELETE)
     //e executa tratamentos com segurança
 
-// Retorna todos os estudios
-const getSelectAllStudio = async () => {
+// Retorna uma lista de todos os filmes do banco de dados
+const getSelectAllFilms = async () => {
 
     try {
+       
+        // Script SQL
+        let sql = `select * from tb_filmes order by filme_id desc`
+
+        // Encaminha o script para o banco de dados
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        if (Array.isArray(result)) {
+            return result
+        } else {
+            return false
+        }
     
-        const sql = "select * from tb_estudio"
+    } catch (error) {
 
-        const result = await prisma.$queryRawUnsafe(sql)
+        return false
+
+    }
+    
+
+}
+
+// Retorna um filme filtrando pelo id do banco de dados
+const getSelectByIdFilms = async (id) => {
+
+    try {
+       
+        // Script SQL
+        let sql = `select * from tb_filmes where filme_id=${id}`
+
+        // Encaminha o script para o banco de dados
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        if (Array.isArray(result)) {
+            return result
+        } else {
+            return false
+        }
+    
+    } catch (error) {
+
+        return false
+
+    }
+
+} 
+
+// Retorna o último filme adicionado na tabela 
+const getSelectLastId = async () => {
+    try {
+        // script SQL para retornar apenas o último id do BD
+        let sql = `select filme_id from tb_filmes order by filme_id desc limit 1`
         
+        // resultado do script sql
+        let result = await prisma.$queryRawUnsafe(sql)
 
-        if(Array.isArray(result)) {
-            return result
+        if (Array.isArray(result)) {
+            return Number(result[0].filme_id)
         } else {
             return false
         }
 
     } catch (error) {
         return false
-    }    
 
-}
-
-// Retorna o estudio pelo id
-const getSelectStudioById = async (id) => {
-
-    try {
-        const sql = `select * from tb_estudio where id = ${id}`
-
-        const result = await prisma.$queryRawUnsafe(sql)
-
-        if(Array.isArray(result)) {
-            return result
-        } else {
-            return false
-        }
-
-    } catch (error) {
-        return false
     }
-
 }
 
-// Retorna o último item registrado dentro da tabela estudio
-const getSelectLastStudio = async () => {
-
-    try {
-
-        const sql = `select * from tb_estudio order by id desc limit 1`
-
-        const result = await prisma.$queryRawUnsafe(sql)
-
-        if(Array.isArray(result)) {
-            return result
-        } else {
-            return false
-        }
-
-    } catch (error) {
-        return false
-    }
-
-}
-
-// Registra um estudios na tabela
-const setInsertStudio = async (studio) => {
+// Insere um filme novo no banco de dados
+const setInsertFilms = async (filme) => {
 
     try {
         
-        const sql = `insert into tb_estudio( nome ) values ( '${studio.nome}' )`
+        let sql = `INSERT INTO tb_filmes (nome, sinopse, data_lancamento, 
+						duracao, orcamento, trailer, capa)
+                    VALUES (
+                        '${filme.nome}',
+                        '${filme.sinopse}',
+                        '${filme.data_lancamento}',
+                        '${filme.duracao}',
+                        '${filme.orcamento}',
+                        '${filme.trailer}',
+                        '${filme.capa}'
+                    )`
 
-        const result = await prisma.$executeRawUnsafe(sql)
+        // $executeRawUnsafe() -> executa o script SQL que não tem retorno de valores
+        let result = await prisma.$executeRawUnsafe(sql)
 
         if(result) {
-            return result
-        } else {
+            return true
+        
+        } else {    
             return false
-        }
+        } 
+            
 
     } catch (error) {
         return false
     }
+
 
 }
 
-// Atualiza um registro dentro da tabela estudio
-const setUpdateStudioById = async (id, studio) => {
+// Altere um filme no banco de dados
+const setUpdateFilms = async (filme) => {
 
     try {
-        
-        const sql = `update tb_estudio set nome = "${studio.nome}" where id = ${id}`
+        let sql = `update tb_filmes set
+                nome                ='${filme.nome}',
+                sinopse             ='${filme.sinopse}',
+                data_lancamento     ='${filme.data_lancamento}',
+                duracao             ='${filme.duracao}',
+                orcamento           ='${filme.orcamento}',
+                trailer             ='${filme.trailer}',
+                capa                ='${filme.capa}'
+                
+                where filme_id = ${filme.id}`
 
-        const result = await prisma.$executeRawUnsafe(sql)
+        let result = await prisma.$executeRawUnsafe(sql)
 
-        if (result) {
-            return result
-        } else {
+        if (result)
+            return true
+        else
             return false
-        }
-
+        
     } catch (error) {
         return false
     }
-
 }
 
-// Deleta um registro dentro da tabela estudio
-const setDeleteStudioById = async (id) => {
+// Exclui um filme pelo id no banco de dados
+const setDeleteFilms = async (id) => {
 
     try {
         
-        const sql = `delete from tb_estudio where id = ${id}`
+        let sql = `delete from tb_filmes where filme_id = ${id}`
 
-        const result = await prisma.$executeRawUnsafe(sql)
+        let result = await prisma.$executeRawUnsafe(sql)
 
         if (result) {
-            return result
+            return true
         } else {
             return false
         }
@@ -175,14 +204,14 @@ const setDeleteStudioById = async (id) => {
     } catch (error) {
         return false
     }
-
+    
 }
 
 module.exports = {
-    getSelectAllStudio,
-    getSelectLastStudio,
-    getSelectStudioById,
-    setInsertStudio,
-    setUpdateStudioById,
-    setDeleteStudioById
+    getSelectAllFilms,
+    getSelectByIdFilms,
+    getSelectLastId,
+    setInsertFilms,
+    setUpdateFilms,
+    setDeleteFilms
 }

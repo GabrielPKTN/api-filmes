@@ -6,7 +6,7 @@
  * Versão: 1.0.0
  *********************************************************************/
 
-const generoDAO = require("../../model/DAO/genero.js")
+const generoDAO = require("../../model/DAO/genero-dao/genero.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const listarGeneros = async () => {

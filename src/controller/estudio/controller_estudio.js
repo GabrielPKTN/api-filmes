@@ -6,7 +6,7 @@
  * Versão: 1.0.0
  *********************************************************************/
 
-const estudioDAO = require("../../model/DAO/estudio.js")
+const estudioDAO = require("../../model/DAO/estudio-dao/estudio.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const listarEstudios = async () => {

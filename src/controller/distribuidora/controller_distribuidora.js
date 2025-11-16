@@ -6,7 +6,7 @@
  * Versão: 1.0.0
  *********************************************************************/
 
-const distribuidoraDAO = require("../../model/DAO/distribuidora.js")
+const distribuidoraDAO = require("../../model/DAO/distribuidora-dao/distribuidora.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const listarDistribuidora = async () => {

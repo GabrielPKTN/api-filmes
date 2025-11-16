@@ -6,7 +6,7 @@
  * Versão: 1.0.0
  *********************************************************************/
 
-const filmeGeneroDAO = require("../../model/DAO/filme_genero.js")
+const filmeGeneroDAO = require("../../model/DAO/filme-dao/filme_genero.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const listarFilmesGeneros = async () => {
