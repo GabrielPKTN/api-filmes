@@ -15,15 +15,15 @@ const listarEstudios = async () => {
 
     try {
         
-        const result = await estudioDAO.getSelectAllStudio()
+        const resultEstudio = await estudioDAO.getSelectAllStudio()
 
-        if(result) {
+        if(resultEstudio) {
 
-            if (result.length > 0) {
+            if (resultEstudio.length > 0) {
 
                 MESSAGES.DEFAULT_HEADER.status                  = MESSAGES.SUCCESS_REQUEST.status
                 MESSAGES.DEFAULT_HEADER.status_code             = MESSAGES.SUCCESS_REQUEST.status_code
-                MESSAGES.DEFAULT_HEADER.items.studios           = result
+                MESSAGES.DEFAULT_HEADER.items.studios           = resultEstudio
 
                 return MESSAGES.DEFAULT_HEADER // 200
 
@@ -49,15 +49,15 @@ const buscarEstudioId = async (id) => {
         
         if (!isNaN(id) && id != "" && id != null && id != undefined && id > 0) {
 
-            const result = await estudioDAO.getSelectStudioById(id)
+            const resultEstudio = await estudioDAO.getSelectStudioById(id)
 
-            if(result) {
+            if(resultEstudio) {
 
-                if(result.length > 0) {
+                if(resultEstudio.length > 0) {
 
                     MESSAGES.DEFAULT_HEADER.status               =  MESSAGES.SUCCESS_REQUEST.status
                     MESSAGES.DEFAULT_HEADER.status_code          =  MESSAGES.SUCCESS_REQUEST.status_code
-                    MESSAGES.DEFAULT_HEADER.items.studio         =  result
+                    MESSAGES.DEFAULT_HEADER.items.studio         =  resultEstudio
 
                     return MESSAGES.DEFAULT_HEADER // 200
 
@@ -91,18 +91,18 @@ const inserirEstudio = async (estudio, contentType) => {
 
             if (!validar) {
 
-                const result = await estudioDAO.setInsertStudio(estudio)
+                const resultEstudio = await estudioDAO.setInsertStudio(estudio)
 
-                if (result) {
+                if (resultEstudio) {
 
-                    const lastId = await estudioDAO.getSelectLastStudio()
+                    const estudioCriado = await estudioDAO.getSelectLastStudio()
 
-                    if(lastId) {
+                    if(estudioCriado) {
 
                         MESSAGES.DEFAULT_HEADER.status                          =   MESSAGES.SUCCESS_CREATED_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code                     =   MESSAGES.SUCCESS_CREATED_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message                         =   MESSAGES.SUCCESS_CREATED_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items.studio_created            =   lastId
+                        MESSAGES.DEFAULT_HEADER.items.studio_created            =   estudioCriado
 
                         return MESSAGES.DEFAULT_HEADER
 
@@ -144,14 +144,16 @@ const atualizarEstudio = async (id, estudio, contentType) => {
 
                 if (!validar) {
 
-                    const result = await estudioDAO.setUpdateStudioById(id, estudio)
+                    const resultEstudio = await estudioDAO.setUpdateStudioById(id, estudio)
 
-                    if(result) {
+                    if(resultEstudio) {
 
-                        MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_UPDATE_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message             = MESSAGES.SUCCESS_UPDATE_ITEM.message
-                        delete MESSAGES.DEFAULT_HEADER.items
+                        let estudioAtualizado = await buscarEstudioId(id)
+
+                        MESSAGES.DEFAULT_HEADER.status                      = MESSAGES.SUCCESS_UPDATE_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code                 = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message                     = MESSAGES.SUCCESS_UPDATE_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.studio_updated        = estudioAtualizado.items.studio
                         
                         return MESSAGES.DEFAULT_HEADER // 200
 
@@ -191,10 +193,10 @@ const excluirEstudio = async (id) => {
 
             if(result) {
 
-                MESSAGES.DEFAULT_HEADER.status          = MESSAGES.SUCCESS_DELETE.status
-                MESSAGES.DEFAULT_HEADER.status_code     = MESSAGES.SUCCESS_DELETE.status_code
-                MESSAGES.DEFAULT_HEADER.message         = MESSAGES.SUCCESS_DELETE.message
-                delete MESSAGES.DEFAULT_HEADER.items
+                MESSAGES.DEFAULT_HEADER.status                      = MESSAGES.SUCCESS_DELETE.status
+                MESSAGES.DEFAULT_HEADER.status_code                 = MESSAGES.SUCCESS_DELETE.status_code
+                MESSAGES.DEFAULT_HEADER.message                     = MESSAGES.SUCCESS_DELETE.message
+                MESSAGES.DEFAULT_HEADER.items.deleted_studio        = validarId.items.studio
 
                 return MESSAGES.DEFAULT_HEADER
 

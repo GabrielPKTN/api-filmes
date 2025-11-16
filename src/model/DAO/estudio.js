@@ -78,7 +78,7 @@ const getSelectAllStudio = async () => {
 const getSelectStudioById = async (id) => {
 
     try {
-        const sql = `select * from tb_estudio where estudio_id = ${id}`
+        const sql = `select * from tb_estudio where id = ${id}`
 
         const result = await prisma.$queryRawUnsafe(sql)
 
@@ -99,7 +99,7 @@ const getSelectLastStudio = async () => {
 
     try {
 
-        const sql = `select * from tb_estudio order by estudio_id desc limit 1`
+        const sql = `select * from tb_estudio order by id desc limit 1`
 
         const result = await prisma.$queryRawUnsafe(sql)
 
@@ -120,7 +120,7 @@ const setInsertStudio = async (studio) => {
 
     try {
         
-        const sql = `insert into tb_estudio( nome_estudio ) values ( '${studio.nome}' )`
+        const sql = `insert into tb_estudio( nome ) values ( '${studio.nome}' )`
 
         const result = await prisma.$executeRawUnsafe(sql)
 
@@ -141,7 +141,7 @@ const setUpdateStudioById = async (id, studio) => {
 
     try {
         
-        const sql = `update tb_estudio set nome_estudio = "${studio.nome}" where estudio_id = ${id}`
+        const sql = `update tb_estudio set nome = "${studio.nome}" where id = ${id}`
 
         const result = await prisma.$executeRawUnsafe(sql)
 
@@ -162,7 +162,7 @@ const setDeleteStudioById = async (id) => {
 
     try {
         
-        const sql = `delete from tb_estudio where estudio_id = ${id}`
+        const sql = `delete from tb_estudio where id = ${id}`
 
         const result = await prisma.$executeRawUnsafe(sql)
 
