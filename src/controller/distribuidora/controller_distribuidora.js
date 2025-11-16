@@ -15,16 +15,17 @@ const listarDistribuidora = async () => {
 
     try {
 
-        let result = await distribuidoraDAO.getSelectAllDistributor()
+        let resultDistribuidora = await distribuidoraDAO.getSelectAllDistributor()
 
-        if (result) {
-            if(result.length > 0) {
+        if (resultDistribuidora) {
+
+            if(resultDistribuidora.length > 0) {
 
                 MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
                 MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
-                MESSAGES.DEFAULT_HEADER.items.distributors = result
+                MESSAGES.DEFAULT_HEADER.items.distributors = resultDistribuidora
 
-                return MESSAGES.DEFAULT_HEADER
+                return MESSAGES.DEFAULT_HEADER // 201
 
             } else {
                 return MESSAGES.ERROR_NOT_FOUND // 404
@@ -48,15 +49,15 @@ const buscarDistribuidoraId = async (id) => {
 
         if (!isNaN(id) && id != '' && id != null && id > 0) {
 
-            let result = await distribuidoraDAO.getSelectDistributorById(id)
+            let resultDistribuidora = await distribuidoraDAO.getSelectDistributorById(id)
 
-            if (result) {
+            if (resultDistribuidora) {
 
-                if (result.length > 0) {
+                if (resultDistribuidora.length > 0) {
 
                     MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
                     MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
-                    MESSAGES.DEFAULT_HEADER.items.distributor = result
+                    MESSAGES.DEFAULT_HEADER.items.distributor = resultDistribuidora
                     
                     return MESSAGES.DEFAULT_HEADER // 200
 
@@ -90,18 +91,18 @@ const inserirDistribuidora = async (distribuidora, contentType) => {
 
             if (!validar) {
 
-                let result = await distribuidoraDAO.setInsertDistributor(distribuidora)
+                let resultDistribuidora = await distribuidoraDAO.setInsertDistributor(distribuidora)
 
-                if (result) {
+                if (resultDistribuidora) {
 
-                    let lastId = await distribuidoraDAO.getSelectLastDistributor()
+                    let distribuidoraCriada = await distribuidoraDAO.getSelectLastDistributor()
 
-                    if (lastId) {
+                    if (distribuidoraCriada) {
 
-                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items.distributor_created = lastId
+                        MESSAGES.DEFAULT_HEADER.status                          = MESSAGES.SUCCESS_CREATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code                     = MESSAGES.SUCCESS_CREATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message                         = MESSAGES.SUCCESS_CREATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.distributor_created       = distribuidoraCriada
 
                         return MESSAGES.DEFAULT_HEADER // 201
 
@@ -142,16 +143,16 @@ const atualizarDistribuidora = async (id, distribuidora, contentType) => {
 
                 if (!validar) {
 
-                    let result = await distribuidoraDAO.setUpdateDistributorById(id, distribuidora) 
+                    let resultDistribuidora = await distribuidoraDAO.setUpdateDistributorById(id, distribuidora) 
 
-                    if (result) {
+                    if (resultDistribuidora) {
 
                         let distribuidoraAtualizada = await buscarDistribuidoraId(id)
 
-                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATE_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATE_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items.distributor_created = distribuidoraAtualizada.items.distributor
+                        MESSAGES.DEFAULT_HEADER.status                          = MESSAGES.SUCCESS_UPDATE_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code                     = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message                         = MESSAGES.SUCCESS_UPDATE_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.distributor_updated       = distribuidoraAtualizada.items.distributor
                         
                         return MESSAGES.DEFAULT_HEADER // 200
 
@@ -187,9 +188,9 @@ const excluirDistribuidora = async (id) => {
 
         if (validarId.status_code == 200) {
 
-            let result = await distribuidoraDAO.setDeleteDistributor(id)
+            let resultDistribuidora = await distribuidoraDAO.setDeleteDistributor(id)
 
-            if (result) {
+            if (resultDistribuidora) {
 
                 MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_DELETE.status
                 MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_DELETE.status_code
@@ -207,6 +208,7 @@ const excluirDistribuidora = async (id) => {
         }
 
     } catch (error) {
+        console.log(error)
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 

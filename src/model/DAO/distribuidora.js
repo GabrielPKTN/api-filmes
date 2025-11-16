@@ -83,7 +83,7 @@ const getSelectDistributorById = async (id) => {
 
     try {
 
-        const sql = `select * from tb_distribuidora where distribuidora_id = ${id}`
+        const sql = `select * from tb_distribuidora where id = ${id}`
 
         const result = await prisma.$queryRawUnsafe(sql)
 
@@ -111,7 +111,7 @@ const getSelectLastDistributor = async () => {
 
     try {
      
-        const sql = "select * from tb_distribuidora order by distribuidora_id desc limit 1"
+        const sql = "select * from tb_distribuidora order by id desc limit 1"
 
         const result = await prisma.$queryRawUnsafe(sql)
 
@@ -134,7 +134,7 @@ const setInsertDistributor = async (distributor) => {
 
     try {
         
-        const sql = `insert into tb_distribuidora(nome_distribuidora) values ( '${distributor.nome}' ) `
+        const sql = `insert into tb_distribuidora(nome) values ( '${distributor.nome}' ) `
 
         const result = await prisma.$executeRawUnsafe(sql)
 
@@ -155,7 +155,9 @@ const setUpdateDistributorById = async (id, distributor) => {
 
     try {
 
-        const sql = `update tb_distribuidora set nome_distribuidora = '${distributor.nome}' where distribuidora_id = ${id}`
+        const sql = `update tb_distribuidora set 
+                    nome = '${distributor.nome}' 
+                    where id = ${id}`
 
         const result = await prisma.$executeRawUnsafe(sql)
 
@@ -176,7 +178,7 @@ const setDeleteDistributor = async (id) => {
 
     try {
         
-        const sql = `delete from tb_distribuidora where distribuidora_id = ${id}`
+        const sql = `delete from tb_distribuidora where id = ${id}`
 
         const result = await prisma.$executeRawUnsafe(sql)
 
@@ -188,7 +190,9 @@ const setDeleteDistributor = async (id) => {
 
 
     } catch (error) {
+
         return false
+        
     }
 
 }
