@@ -33,7 +33,7 @@
  ********************************************************************/
 
 //Import da dependência do prisma que permite a execução do de script SQL no BD 
-const {PrismaClient} = require('../../generated/prisma') 
+const {PrismaClient} = require('../../../generated/prisma') 
 
 //Cria um novo objeto baseado na classe PrismaClient
 const prisma = new PrismaClient()
@@ -57,7 +57,7 @@ const getSelectAllLanguage = async () => {
 
     try {
     
-        const sql = "select * from tb_idioma_dublagem"
+        const sql = "select * from tb_idioma"
 
         const result = await prisma.$queryRawUnsafe(sql)
         
@@ -78,7 +78,7 @@ const getSelectAllLanguage = async () => {
 const getSelectLanguageById = async (id) => {
 
     try {
-        const sql = `select * from tb_idioma_dublagem where idioma_dublagem_id = ${id}`
+        const sql = `select * from tb_idioma where id = ${id}`
 
         const result = await prisma.$queryRawUnsafe(sql)
 
@@ -99,7 +99,7 @@ const getSelectLastLanguage = async () => {
 
     try {
 
-        const sql = `select * from tb_idioma_dublagem order by idioma_dublagem_id desc limit 1`
+        const sql = `select * from tb_idioma order by id desc limit 1`
 
         const result = await prisma.$queryRawUnsafe(sql)
 
@@ -120,7 +120,7 @@ const setInsertLanguage = async (language) => {
 
     try {
         
-        const sql = `insert into tb_idioma_dublagem( idioma_dublador ) values ( '${language.nome}' )`
+        const sql = `insert into tb_idioma( sigla_idioma ) values ( '${language.nome}' )`
 
         const result = await prisma.$executeRawUnsafe(sql)
 
@@ -141,7 +141,7 @@ const setUpdateLanguageById = async (id, language) => {
 
     try {
         
-        const sql = `update tb_idioma_dublagem set idioma_dublador = "${language.nome}" where idioma_dublagem_id = ${id}`
+        const sql = `update tb_idioma set sigla_idioma = "${language.nome}" where id = ${id}`
 
         const result = await prisma.$executeRawUnsafe(sql)
 
@@ -162,7 +162,7 @@ const setDeleteLanguageById = async (id) => {
 
     try {
         
-        const sql = `delete from tb_idioma_dublagem where idioma_dublagem_id = ${id}`
+        const sql = `delete from tb_idioma where id = ${id}`
 
         const result = await prisma.$executeRawUnsafe(sql)
 

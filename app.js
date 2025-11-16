@@ -35,7 +35,7 @@ const cargoRoutes = require("./src/routes/routes_cargo.js")
 const distribuidoraRoutes = require("./src/routes/routes_distribuidora.js")
 const estudioRoutes = require("./src/routes/routes_estudio.js")
 const papelRoutes = require("./src/routes/routes_papel.js")
-const idiomaDublagemRoutes = require("./src/routes/routes_ idioma_dublagem.js")
+const idiomaRoutes = require("./src/routes/routes_idioma.js")
 
 // EndPoints de routes
 app.use('/v1/locadora', filmeRoutes)
@@ -44,7 +44,7 @@ app.use('/v1/locadora', cargoRoutes)
 app.use('/v1/locadora', distribuidoraRoutes)
 app.use('/v1/locadora', estudioRoutes)
 app.use('/v1/locadora', papelRoutes)
-app.use('/v1/locadora', idiomaDublagemRoutes)
+app.use('/v1/locadora', idiomaRoutes)
 
 // DOCUMENTAÇÃO SWAGGER!!
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))

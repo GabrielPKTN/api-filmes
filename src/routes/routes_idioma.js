@@ -8,7 +8,7 @@
 
 const express = require('express')
 const router = express.Router()
-const controllerIdioma = require('../controller/idioma_dublagem/controller_idioma_dublagem.js')
+const controllerIdioma = require('../controller/idioma/controller_idioma.js')
 
 const cors       = require('cors')           // Responsável pelas permissões da API (APP)
 const bodyParser = require('body-parser')    // Responsável por gerenciar a chegada dos dados da API com o front

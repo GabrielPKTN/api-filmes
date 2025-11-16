@@ -6,7 +6,7 @@
  * Versão: 1.0.0
  *********************************************************************/
 
-const idiomaDAO = require("../../model/DAO/idioma-dao/idioma_dublagem.js")
+const idiomaDAO = require("../../model/DAO/idioma-dao/idioma.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const listarIdiomas = async () => {
@@ -15,15 +15,15 @@ const listarIdiomas = async () => {
 
     try {
         
-        const result = await idiomaDAO.getSelectAllLanguage()
+        const resultIdioma = await idiomaDAO.getSelectAllLanguage()
 
-        if(result) {
+        if(resultIdioma) {
 
-            if (result.length > 0) {
+            if (resultIdioma.length > 0) {
 
                 MESSAGES.DEFAULT_HEADER.status                  = MESSAGES.SUCCESS_REQUEST.status
                 MESSAGES.DEFAULT_HEADER.status_code             = MESSAGES.SUCCESS_REQUEST.status_code
-                MESSAGES.DEFAULT_HEADER.items.languages         = result
+                MESSAGES.DEFAULT_HEADER.items.languages         = resultIdioma
 
                 return MESSAGES.DEFAULT_HEADER // 200
 
@@ -49,15 +49,15 @@ const buscarIdiomaId = async (id) => {
         
         if (!isNaN(id) && id != "" && id != null && id != undefined && id > 0) {
 
-            const result = await idiomaDAO.getSelectLanguageById(id)
+            const resultIdioma = await idiomaDAO.getSelectLanguageById(id)
 
-            if(result) {
+            if(resultIdioma) {
 
-                if(result.length > 0) {
+                if(resultIdioma.length > 0) {
 
                     MESSAGES.DEFAULT_HEADER.status               =  MESSAGES.SUCCESS_REQUEST.status
                     MESSAGES.DEFAULT_HEADER.status_code          =  MESSAGES.SUCCESS_REQUEST.status_code
-                    MESSAGES.DEFAULT_HEADER.items.role           =  result
+                    MESSAGES.DEFAULT_HEADER.items.language       =  resultIdioma
 
                     return MESSAGES.DEFAULT_HEADER // 200
 
@@ -91,18 +91,18 @@ const inserirIdioma = async (idioma, contentType) => {
 
             if (!validar) {
 
-                const result = await idiomaDAO.setInsertLanguage(idioma)
+                const resultIdioma = await idiomaDAO.setInsertLanguage(idioma)
 
-                if (result) {
+                if (resultIdioma) {
 
-                    const lastId = await idiomaDAO.getSelectLastLanguage()
+                    const idiomaCriado = await idiomaDAO.getSelectLastLanguage()
 
-                    if(lastId) {
+                    if(idiomaCriado) {
 
                         MESSAGES.DEFAULT_HEADER.status                      =   MESSAGES.SUCCESS_CREATED_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code                 =   MESSAGES.SUCCESS_CREATED_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message                     =   MESSAGES.SUCCESS_CREATED_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items.language_created      =   lastId
+                        MESSAGES.DEFAULT_HEADER.items.language_created      =   idiomaCriado
 
                         return MESSAGES.DEFAULT_HEADER
 
@@ -148,10 +148,12 @@ const atualizarIdioma = async (id, idioma, contentType) => {
 
                     if(result) {
 
-                        MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_UPDATE_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message             = MESSAGES.SUCCESS_UPDATE_ITEM.message
-                        delete MESSAGES.DEFAULT_HEADER.items
+                        let idiomaAtualizado = await buscarIdiomaId(id)
+
+                        MESSAGES.DEFAULT_HEADER.status                      = MESSAGES.SUCCESS_UPDATE_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code                 = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message                     = MESSAGES.SUCCESS_UPDATE_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.updated_language      = idiomaAtualizado.items.language
                         
                         return MESSAGES.DEFAULT_HEADER // 200
 
@@ -191,12 +193,12 @@ const excluirIdioma = async (id) => {
 
             if(result) {
 
-                MESSAGES.DEFAULT_HEADER.status          = MESSAGES.SUCCESS_DELETE.status
-                MESSAGES.DEFAULT_HEADER.status_code     = MESSAGES.SUCCESS_DELETE.status_code
-                MESSAGES.DEFAULT_HEADER.message         = MESSAGES.SUCCESS_DELETE.message
-                delete MESSAGES.DEFAULT_HEADER.items
+                MESSAGES.DEFAULT_HEADER.status                  = MESSAGES.SUCCESS_DELETE.status
+                MESSAGES.DEFAULT_HEADER.status_code             = MESSAGES.SUCCESS_DELETE.status_code
+                MESSAGES.DEFAULT_HEADER.message                 = MESSAGES.SUCCESS_DELETE.message
+                MESSAGES.DEFAULT_HEADER.items.deleted_language  = validarId.items.language
 
-                return MESSAGES.DEFAULT_HEADER
+                return MESSAGES.DEFAULT_HEADER // 200
 
             } else {
                 return MESSAGES.ERROR_INTERNAL_SERVER_MODEL // 500
