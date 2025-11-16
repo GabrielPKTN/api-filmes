@@ -145,15 +145,16 @@ const atualizarCargo = async (id, cargo, contentType) => {
 
                 if (!validar) {
 
-                    const resultCargo = await cargoDAO.setUpdateRoleById(id, cargo)
+                    let resultCargo = await cargoDAO.setUpdateRoleById(id, cargo)
 
                     if(resultCargo) {
+
+                        let cargoAtualizado = await buscarCargoId(id)
 
                         MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_UPDATE_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message             = MESSAGES.SUCCESS_UPDATE_ITEM.message
-                        
-                        delete MESSAGES.DEFAULT_HEADER.items
+                        MESSAGES.DEFAULT_HEADER.items.updated_role  = cargoAtualizado.items.role
                         
                         return MESSAGES.DEFAULT_HEADER // 200
 
@@ -193,10 +194,10 @@ const excluirCargo = async (id) => {
 
             if(resultCargo) {
 
-                MESSAGES.DEFAULT_HEADER.status          = MESSAGES.SUCCESS_DELETE.status
-                MESSAGES.DEFAULT_HEADER.status_code     = MESSAGES.SUCCESS_DELETE.status_code
-                MESSAGES.DEFAULT_HEADER.message         = MESSAGES.SUCCESS_DELETE.message
-                delete MESSAGES.DEFAULT_HEADER.items
+                MESSAGES.DEFAULT_HEADER.status                  = MESSAGES.SUCCESS_DELETE.status
+                MESSAGES.DEFAULT_HEADER.status_code             = MESSAGES.SUCCESS_DELETE.status_code
+                MESSAGES.DEFAULT_HEADER.message                 = MESSAGES.SUCCESS_DELETE.message
+                MESSAGES.DEFAULT_HEADER.items.deleted_role      = validarId.items.role
 
                 return MESSAGES.DEFAULT_HEADER // 201
 
