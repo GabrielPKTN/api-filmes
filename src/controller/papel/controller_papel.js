@@ -15,15 +15,15 @@ const listarPapeis = async () => {
 
     try {
         
-        const result = await papelDAO.getSelectAllRole()
+        const resultPapel = await papelDAO.getSelectAllPosition()
 
-        if(result) {
+        if(resultPapel) {
 
-            if (result.length > 0) {
+            if (resultPapel.length > 0) {
 
                 MESSAGES.DEFAULT_HEADER.status                  = MESSAGES.SUCCESS_REQUEST.status
                 MESSAGES.DEFAULT_HEADER.status_code             = MESSAGES.SUCCESS_REQUEST.status_code
-                MESSAGES.DEFAULT_HEADER.items.roles             = result
+                MESSAGES.DEFAULT_HEADER.items.character_roles   = resultPapel
 
                 return MESSAGES.DEFAULT_HEADER // 200
 
@@ -49,15 +49,15 @@ const buscarPapelId = async (id) => {
         
         if (!isNaN(id) && id != "" && id != null && id != undefined && id > 0) {
 
-            const result = await papelDAO.getSelectRoleById(id)
+            const resultPapel = await papelDAO.getSelectPositionById(id)
 
-            if(result) {
+            if(resultPapel) {
 
-                if(result.length > 0) {
+                if(resultPapel.length > 0) {
 
-                    MESSAGES.DEFAULT_HEADER.status               =  MESSAGES.SUCCESS_REQUEST.status
-                    MESSAGES.DEFAULT_HEADER.status_code          =  MESSAGES.SUCCESS_REQUEST.status_code
-                    MESSAGES.DEFAULT_HEADER.items.role           =  result
+                    MESSAGES.DEFAULT_HEADER.status                  =  MESSAGES.SUCCESS_REQUEST.status
+                    MESSAGES.DEFAULT_HEADER.status_code             =  MESSAGES.SUCCESS_REQUEST.status_code
+                    MESSAGES.DEFAULT_HEADER.items.character_role    =  resultPapel
 
                     return MESSAGES.DEFAULT_HEADER // 200
 
@@ -91,20 +91,20 @@ const inserirPapel = async (papel, contentType) => {
 
             if (!validar) {
 
-                const result = await papelDAO.setInsertRole(papel)
+                const resultPapel = await papelDAO.setInsertPosition(papel)
 
-                if (result) {
+                if (resultPapel) {
 
-                    const lastId = await papelDAO.getSelectLastRole()
+                    const papelCriado = await papelDAO.getSelectLastPosition()
 
-                    if(lastId) {
+                    if(papelCriado) {
 
-                        MESSAGES.DEFAULT_HEADER.status                      =   MESSAGES.SUCCESS_CREATED_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code                 =   MESSAGES.SUCCESS_CREATED_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message                     =   MESSAGES.SUCCESS_CREATED_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items.role_created          =   lastId
+                        MESSAGES.DEFAULT_HEADER.status                                  =   MESSAGES.SUCCESS_CREATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code                             =   MESSAGES.SUCCESS_CREATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message                                 =   MESSAGES.SUCCESS_CREATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.character_role_created            =   papelCriado
 
-                        return MESSAGES.DEFAULT_HEADER
+                        return MESSAGES.DEFAULT_HEADER // 200
 
                     } else {
                         return MESSAGES.ERROR_INTERNAL_SERVER_MODEL // 500
@@ -123,6 +123,7 @@ const inserirPapel = async (papel, contentType) => {
         }
 
     } catch (error) {
+
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 
@@ -144,14 +145,16 @@ const atualizarPapel = async (id, papel, contentType) => {
 
                 if (!validar) {
 
-                    const result = await papelDAO.setUpdateRoleById(id, papel)
+                    let resultPapel = await papelDAO.setUpdatePositionById(id, papel)
 
-                    if(result) {
+                    if(resultPapel) {
 
-                        MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_UPDATE_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message             = MESSAGES.SUCCESS_UPDATE_ITEM.message
-                        delete MESSAGES.DEFAULT_HEADER.items
+                        let papelAtualizado = await buscarPapelId(id)
+
+                        MESSAGES.DEFAULT_HEADER.status                          = MESSAGES.SUCCESS_UPDATE_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code                     = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message                         = MESSAGES.SUCCESS_UPDATE_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.updated_character_role    = papelAtualizado.items.character_role
                         
                         return MESSAGES.DEFAULT_HEADER // 200
 
@@ -187,14 +190,14 @@ const excluirPapel = async (id) => {
     
         if (validarId.status_code == 200) {
 
-            const result = await papelDAO.setDeleteRoleById(id)
+            const result = await papelDAO.setDeletePositionById(id)
 
             if(result) {
 
-                MESSAGES.DEFAULT_HEADER.status          = MESSAGES.SUCCESS_DELETE.status
-                MESSAGES.DEFAULT_HEADER.status_code     = MESSAGES.SUCCESS_DELETE.status_code
-                MESSAGES.DEFAULT_HEADER.message         = MESSAGES.SUCCESS_DELETE.message
-                delete MESSAGES.DEFAULT_HEADER.items
+                MESSAGES.DEFAULT_HEADER.status                          = MESSAGES.SUCCESS_DELETE.status
+                MESSAGES.DEFAULT_HEADER.status_code                     = MESSAGES.SUCCESS_DELETE.status_code
+                MESSAGES.DEFAULT_HEADER.message                         = MESSAGES.SUCCESS_DELETE.message
+                MESSAGES.DEFAULT_HEADER.items.deleted_character_role    = validarId.items.character_role
 
                 return MESSAGES.DEFAULT_HEADER
 

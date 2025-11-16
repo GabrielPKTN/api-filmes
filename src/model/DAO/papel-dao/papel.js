@@ -53,7 +53,7 @@ const prisma = new PrismaClient()
     //e executa tratamentos com segurança
 
 // Retorna todos os papéis
-const getSelectAllRole = async () => {
+const getSelectAllPosition = async () => {
 
     try {
     
@@ -75,10 +75,10 @@ const getSelectAllRole = async () => {
 }
 
 // Retorna o papel pelo id
-const getSelectRoleById = async (id) => {
+const getSelectPositionById = async (id) => {
 
     try {
-        const sql = `select * from tb_papel where papel_id = ${id}`
+        const sql = `select * from tb_papel where id = ${id}`
 
         const result = await prisma.$queryRawUnsafe(sql)
 
@@ -95,11 +95,11 @@ const getSelectRoleById = async (id) => {
 }
 
 // Retorna o último item registrado dentro da tabela papel
-const getSelectLastRole = async () => {
+const getSelectLastPosition = async () => {
 
     try {
 
-        const sql = `select * from tb_papel order by papel_id desc limit 1`
+        const sql = `select * from tb_papel order by id desc limit 1`
 
         const result = await prisma.$queryRawUnsafe(sql)
 
@@ -116,11 +116,11 @@ const getSelectLastRole = async () => {
 }
 
 // Registra um papéis na tabela
-const setInsertRole = async (role) => {
+const setInsertPosition = async (position) => {
 
     try {
         
-        const sql = `insert into tb_papel( nome_papel ) values ( '${role.nome}' )`
+        const sql = `insert into tb_papel( nome ) values ( '${position.nome}' )`
 
         const result = await prisma.$executeRawUnsafe(sql)
 
@@ -137,11 +137,11 @@ const setInsertRole = async (role) => {
 }
 
 // Atualiza um registro dentro da tabela papel
-const setUpdateRoleById = async (id, role) => {
+const setUpdatePositionById = async (id, position) => {
 
     try {
         
-        const sql = `update tb_papel set nome_papel = "${role.nome}" where papel_id = ${id}`
+        const sql = `update tb_papel set nome = "${position.nome}" where id = ${id}`
 
         const result = await prisma.$executeRawUnsafe(sql)
 
@@ -158,11 +158,11 @@ const setUpdateRoleById = async (id, role) => {
 }
 
 // Deleta um registro dentro da tabela papel
-const setDeleteRoleById = async (id) => {
+const setDeletePositionById = async (id) => {
 
     try {
         
-        const sql = `delete from tb_papel where papel_id = ${id}`
+        const sql = `delete from tb_papel where id = ${id}`
 
         const result = await prisma.$executeRawUnsafe(sql)
 
@@ -179,10 +179,10 @@ const setDeleteRoleById = async (id) => {
 }
 
 module.exports = {
-    getSelectAllRole,
-    getSelectLastRole,
-    getSelectRoleById,
-    setInsertRole,
-    setUpdateRoleById,
-    setDeleteRoleById
+    getSelectAllPosition,
+    getSelectLastPosition,
+    getSelectPositionById,
+    setInsertPosition,
+    setUpdatePositionById,
+    setDeletePositionById
 }
