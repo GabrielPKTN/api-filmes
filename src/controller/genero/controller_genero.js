@@ -110,7 +110,6 @@ const inserirGenero = async (genero, contentType) => {
                 if (resultGenero) {
 
                     let generoCriado = await generoDAO.getSelectLastGenre()
-                    console.log(generoCriado)
 
                     if (generoCriado) {
 
@@ -247,7 +246,7 @@ const excluirGenero = async (id) => {
         }
 
     } catch (error) {
-        console.log(error)
+        
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 

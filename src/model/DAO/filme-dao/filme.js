@@ -53,12 +53,12 @@ const prisma = new PrismaClient()
     //e executa tratamentos com segurança
 
 // Retorna uma lista de todos os filmes do banco de dados
-const getSelectAllFilms = async () => {
+const getSelectAllMovies = async () => {
 
     try {
        
         // Script SQL
-        let sql = `select * from tb_filmes order by filme_id desc`
+        let sql = `select * from tb_filme order by id desc`
 
         // Encaminha o script para o banco de dados
         let result = await prisma.$queryRawUnsafe(sql)
@@ -79,12 +79,12 @@ const getSelectAllFilms = async () => {
 }
 
 // Retorna um filme filtrando pelo id do banco de dados
-const getSelectByIdFilms = async (id) => {
+const getSelectByIdMovies = async (id) => {
 
     try {
        
         // Script SQL
-        let sql = `select * from tb_filmes where filme_id=${id}`
+        let sql = `select * from tb_filme where id=${id}`
 
         // Encaminha o script para o banco de dados
         let result = await prisma.$queryRawUnsafe(sql)
@@ -104,16 +104,16 @@ const getSelectByIdFilms = async (id) => {
 } 
 
 // Retorna o último filme adicionado na tabela 
-const getSelectLastId = async () => {
+const getSelectLastMovies = async () => {
     try {
         // script SQL para retornar apenas o último id do BD
-        let sql = `select filme_id from tb_filmes order by filme_id desc limit 1`
+        let sql = `select * from tb_filme order by id desc limit 1`
         
         // resultado do script sql
         let result = await prisma.$queryRawUnsafe(sql)
 
         if (Array.isArray(result)) {
-            return Number(result[0].filme_id)
+            return result
         } else {
             return false
         }
@@ -125,14 +125,14 @@ const getSelectLastId = async () => {
 }
 
 // Insere um filme novo no banco de dados
-const setInsertFilms = async (filme) => {
+const setInsertMovies = async (filme) => {
 
     try {
         
-        let sql = `INSERT INTO tb_filmes (nome, sinopse, data_lancamento, 
+        let sql = `INSERT INTO tb_filme (titulo, sinopse, data_lancamento, 
 						duracao, orcamento, trailer, capa)
                     VALUES (
-                        '${filme.nome}',
+                        '${filme.titulo}',
                         '${filme.sinopse}',
                         '${filme.data_lancamento}',
                         '${filme.duracao}',
@@ -160,11 +160,11 @@ const setInsertFilms = async (filme) => {
 }
 
 // Altere um filme no banco de dados
-const setUpdateFilms = async (filme) => {
+const setUpdateMovies = async (filme) => {
 
     try {
-        let sql = `update tb_filmes set
-                nome                ='${filme.nome}',
+        let sql = `update tb_filme set
+                titulo              ='${filme.titulo}',
                 sinopse             ='${filme.sinopse}',
                 data_lancamento     ='${filme.data_lancamento}',
                 duracao             ='${filme.duracao}',
@@ -172,7 +172,7 @@ const setUpdateFilms = async (filme) => {
                 trailer             ='${filme.trailer}',
                 capa                ='${filme.capa}'
                 
-                where filme_id = ${filme.id}`
+                where id = ${filme.id}`
 
         let result = await prisma.$executeRawUnsafe(sql)
 
@@ -187,11 +187,11 @@ const setUpdateFilms = async (filme) => {
 }
 
 // Exclui um filme pelo id no banco de dados
-const setDeleteFilms = async (id) => {
+const setDeleteMovies = async (id) => {
 
     try {
         
-        let sql = `delete from tb_filmes where filme_id = ${id}`
+        let sql = `delete from tb_filme where id = ${id}`
 
         let result = await prisma.$executeRawUnsafe(sql)
 
@@ -208,10 +208,10 @@ const setDeleteFilms = async (id) => {
 }
 
 module.exports = {
-    getSelectAllFilms,
-    getSelectByIdFilms,
-    getSelectLastId,
-    setInsertFilms,
-    setUpdateFilms,
-    setDeleteFilms
+    getSelectAllMovies,
+    getSelectByIdMovies,
+    getSelectLastMovies,
+    setInsertMovies,
+    setUpdateMovies,
+    setDeleteMovies
 }

@@ -27,7 +27,7 @@ const prisma = new PrismaClient()
     //e executa tratamentos com segurança
 
 // Retorna todos os filmes e generos da tabela
-const getSelectAllFilmsGenres = async () => {
+const getSelectAllMoviesGenres = async () => {
 
     try {
 
@@ -46,7 +46,7 @@ const getSelectAllFilmsGenres = async () => {
         }
 
     } catch (error) {
-        console.log(error)
+        
         return false
 
     }
@@ -54,11 +54,11 @@ const getSelectAllFilmsGenres = async () => {
 }
 
 // Retorna o filme com genero pelo id
-const getSelectFilmsGenresById = async (id) => {
+const getSelectMoviesGenresById = async (id) => {
 
     try {
         
-        sql = `select * from tb_filme_genero where filme_genero_id = ${id}`
+        sql = `select * from tb_filme_genero where id = ${id}`
 
         result = await prisma.$queryRawUnsafe(sql)
 
@@ -81,25 +81,26 @@ const getSelectFilmsGenresById = async (id) => {
 }
 
 // Retorna o retorna um lista de generos filtrando pelo id do filme
-const getSelectGenresByIdFilms = async (filmId) => {
+const getSelectGenresByIdMovies = async (movie_id) => {
 
     try {
         
         const sql = `select
-                        g.genero_id,
-                        g.nome_genero
-                        from tb_filme_genero fg
+                        tb_genero.id,
+                        tb_genero.nome
+                        
+                        from tb_filme_genero
+                        
+                        join tb_filme 
+                            on tb_filme.id = tb_filme_genero.id_filme
+                        
+                        join tb_genero 
+                            on tb_genero.id = tb_filme_genero.id_genero
                             
-                            join tb_filmes f 
-                                on f.filme_id = fg.filme_id
-
-                            join tb_genero g 
-                                on g.genero_id = fg.genero_id
-
-                        where f.filme_id = ${filmId}`
+                        where tb_filme.id = ${movie_id};`
         
         result = await prisma.$queryRawUnsafe(sql)
-        
+
         if (Array.isArray(result)) {
                             
             return result
@@ -117,22 +118,23 @@ const getSelectGenresByIdFilms = async (filmId) => {
 }
 
 // Retorna o retorna um lista de filmes filtrando pelo id do genero
-const getSelectFilmsByIdGenres = async (genreId) => {
+const getSelectMoviesByIdGenres = async (genre_id) => {
 
     try {
         const sql = `select
-                        g.nome_genero as genero,
-                        f.filme_id,
-                        f.nome
-                        from tb_filme_genero fg
-                            
-                            join tb_filmes f 
-                                on f.filme_id = fg.filme_id
 
-                            join tb_genero g 
-                                on g.genero_id = fg.genero_id
+                    tb_filme.id,
+                    tb_filme.titulo
 
-                        where g.genero_id = ${genreId}`
+                    from tb_filme_genero
+                        
+                        join tb_filme
+                            on tb_filme.id = tb_filme_genero.id_filme
+
+                        join tb_genero
+                            on tb_genero.id = tb_filme_genero.id_genero
+
+                    where tb_genero.id = ${genre_id};`
 
         result = await prisma.$queryRawUnsafe(sql)
 
@@ -154,11 +156,11 @@ const getSelectFilmsByIdGenres = async (genreId) => {
 }
 
 // Retorna o último id de genero registrado na tabela
-const getSelectLastId = async () => {
+const getSelectLastMovieGenre = async () => {
 
     try {
         
-        sql = 'select * from tb_filme_genero order by filme_genero_id desc limit 1'
+        sql = 'select * from tb_filme_genero order by id desc limit 1'
 
         result = await prisma.$queryRawUnsafe(sql)
 
@@ -181,14 +183,14 @@ const getSelectLastId = async () => {
 }
 
 // Registra um gênero na tabela
-const setInsertFilmsGenres = async (filmGenre) => {
+const setInsertMoviesGenres = async (movie_genre) => {
     
     try {
         
-        sql = `INSERT INTO tb_filme_genero(filme_id, genero_id) 
+        sql = `INSERT INTO tb_filme_genero(id_filme, id_genero) 
             VALUES (
-                '${filmGenre.filme_id}',
-                '${filmGenre.genero_id}'
+                '${movie_genre.id_filme}',
+                '${movie_genre.id_genero}'
             );`
 
         result = await prisma.$executeRawUnsafe(sql)
@@ -213,16 +215,16 @@ const setInsertFilmsGenres = async (filmGenre) => {
 }
 
 // Atualiza o registro de um gênero na tabela pelo id
-const setUpdateFilmsGenres = async (filmGenre) => {
+const setUpdateMoviesGenres = async (movie_genre) => {
 
     try {
         
         let sql =  `update tb_filme_genero set  
                     
-                    filme_id = '${filmGenre.filme_id}',
-                    genero_id = '${filmGenre.genero_id}
+                    id_filme = '${movie_genre.id_filme}',
+                    id_genero = '${movie_genre.id_genero}
 
-                    where filme_genero_id  = ${filmGenre.id}`
+                    where id  = ${movie_genre.id}`
 
         let result = await prisma.$executeRawUnsafe(sql)
 
@@ -241,11 +243,11 @@ const setUpdateFilmsGenres = async (filmGenre) => {
 }
 
 // Deleta um registro da tabela gênero pelo id
-const setDeleteFilmsGenres = async (id) => {
+const setDeleteMoviesGenres = async (id) => {
 
     try {
 
-        let sql = `delete from tb_filme_genero where filme_genero_id = ${id}`
+        let sql = `delete from tb_filme_genero where id = ${id}`
 
         let result = prisma.$executeRawUnsafe(sql)
 
@@ -262,12 +264,12 @@ const setDeleteFilmsGenres = async (id) => {
 }
 
 module.exports = {
-    getSelectAllFilmsGenres,
-    getSelectFilmsGenresById,
-    getSelectFilmsByIdGenres,
-    getSelectGenresByIdFilms,
-    getSelectLastId,
-    setInsertFilmsGenres,
-    setUpdateFilmsGenres,
-    setDeleteFilmsGenres
+    getSelectAllMoviesGenres,
+    getSelectMoviesGenresById,
+    getSelectMoviesByIdGenres,
+    getSelectGenresByIdMovies,
+    getSelectLastMovieGenre,
+    setInsertMoviesGenres,
+    setUpdateMoviesGenres,
+    setDeleteMoviesGenres
 }

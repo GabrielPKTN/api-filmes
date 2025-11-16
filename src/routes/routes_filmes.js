@@ -57,7 +57,6 @@ router.put('/filme/:id', cors(), bodyParserJSON, async (req, res) => {
 
     let filme = await controllerFilme.atualizarFilme(dadosBody, idFilme, contentType)
 
-    
     res.status(filme.status_code)
     res.json(filme)
 

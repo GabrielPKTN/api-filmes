@@ -46,7 +46,7 @@ const getSelectAllGenre = async () => {
         }
 
     } catch (error) {
-        console.log(error)
+        
         return false
 
     }

@@ -208,7 +208,6 @@ const excluirDistribuidora = async (id) => {
         }
 
     } catch (error) {
-        console.log(error)
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 

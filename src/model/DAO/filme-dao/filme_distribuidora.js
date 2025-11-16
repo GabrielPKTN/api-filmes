@@ -46,7 +46,7 @@ const getSelectAllFilmsDistributor = async () => {
         }
 
     } catch (error) {
-        console.log(error)
+        
         return false
 
     }

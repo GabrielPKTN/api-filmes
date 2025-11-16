@@ -5,6 +5,7 @@ USE db_locadora_filme_ds2m_25_2;
 CREATE TABLE tb_filme (
 	
 	id INT PRIMARY KEY AUTO_INCREMENT,
+	titulo VARCHAR(100) NOT NULL,
 	sinopse TEXT NULL,
 	data_lancamento DATE NULL,
 	duracao TIME NOT NULL,
@@ -33,6 +34,17 @@ CREATE TABLE tb_profissional(
 	FOREIGN KEY (id_cargo)
 	REFERENCES tb_cargo(id)
 	
+);
+
+CREATE TABLE tb_equipe_tecnica(
+
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	id_filme INT NOT NULL,
+	
+	CONSTRAINT FK_FILME_EQUIPE_TECNICA
+	FOREIGN KEY (id_filme)
+	REFERENCES tb_filme(id)
+
 );
 
 CREATE TABLE tb_profissional_cargo(
@@ -64,17 +76,6 @@ CREATE TABLE tb_profissional_equipe(
 	CONSTRAINT FK_EQUIPE_TECNICA_EQUIPE_TECNICA
 	FOREIGN KEY (id_equipe_tecnica)
 	REFERENCES tb_equipe_tecnica(id)
-
-);
-
-CREATE TABLE tb_equipe_tecnica(
-
-	id INT PRIMARY KEY AUTO_INCREMENT,
-	id_filme INT NOT NULL,
-	
-	CONSTRAINT FK_FILME_EQUIPE_TECNICA
-	FOREIGN KEY (id_filme)
-	REFERENCES tb_filme(id)
 
 );
 
