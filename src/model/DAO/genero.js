@@ -31,7 +31,7 @@ const getSelectAllGenre = async () => {
 
     try {
 
-        sql = "select * from tb_genero order by genero_id asc"
+        sql = "select * from tb_genero order by id asc"
 
         result = await prisma.$queryRawUnsafe(sql)
 
@@ -58,7 +58,7 @@ const getSelectGenreById = async (id) => {
 
     try {
         
-        sql = `select * from tb_genero where genero_id = ${id}`
+        sql = `select * from tb_genero where id = ${id}`
 
         result = await prisma.$queryRawUnsafe(sql)
 
@@ -81,11 +81,11 @@ const getSelectGenreById = async (id) => {
 }
 
 // Retorna o último id de genero registrado na tabela
-const getSelectLastId = async () => {
+const getSelectLastGenre = async () => {
 
     try {
         
-        sql = 'select * from tb_genero order by genero_id desc limit 1'
+        sql = 'select * from tb_genero order by id desc limit 1'
 
         result = await prisma.$queryRawUnsafe(sql)
 
@@ -112,9 +112,9 @@ const setInsertGenres = async (genero) => {
     
     try {
         
-        sql = `INSERT INTO tb_genero(nome_genero) 
+        sql = `INSERT INTO tb_genero(nome) 
             VALUES (
-                '${genero.nome_genero}'
+                '${genero.nome}'
             );`
 
         result = await prisma.$executeRawUnsafe(sql)
@@ -143,7 +143,7 @@ const setUpdateGenres = async (id, genero) => {
 
     try {
         
-        let sql =  `update tb_genero set nome_genero = '${genero.nome_genero}' where genero_id  = ${id}`
+        let sql =  `update tb_genero set nome = '${genero.nome}' where id = ${id}`
 
         let result = await prisma.$executeRawUnsafe(sql)
 
@@ -166,7 +166,7 @@ const setDeleteGenre = async (id) => {
 
     try {
 
-        let sql = `delete from tb_genero where genero_id = ${id}`
+        let sql = `delete from tb_genero where id = ${id}`
 
         let result = prisma.$executeRawUnsafe(sql)
 
@@ -185,7 +185,7 @@ const setDeleteGenre = async (id) => {
 module.exports = {
     getSelectAllGenre,
     getSelectGenreById,
-    getSelectLastId,
+    getSelectLastGenre,
     setInsertGenres,
     setUpdateGenres,
     setDeleteGenre

@@ -55,14 +55,14 @@ const buscarGeneroId = async (id) => {
 
         if (!isNaN(id) && id != '' && id != null && id > 0) {
 
-            let result = await generoDAO.getSelectGenreById(id)
+            let resultGenero = await generoDAO.getSelectGenreById(id)
 
-            if (result) {
-                if (result.length > 0) {
+            if (resultGenero) {
+                if (resultGenero.length > 0) {
 
                     MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
                     MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
-                    MESSAGES.DEFAULT_HEADER.items.genre = result
+                    MESSAGES.DEFAULT_HEADER.items.genre = resultGenero
 
                     return MESSAGES.DEFAULT_HEADER //200
 
@@ -105,18 +105,19 @@ const inserirGenero = async (genero, contentType) => {
 
                 //Processamento
                 //Chamando função para inserir o genero no BD
-                let result = await generoDAO.setInsertGenres(genero)
+                let resultGenero = await generoDAO.setInsertGenres(genero)
 
-                if (result) {
+                if (resultGenero) {
 
-                    let lastId = await generoDAO.getSelectLastId()
+                    let generoCriado = await generoDAO.getSelectLastGenre()
+                    console.log(generoCriado)
 
-                    if (lastId) {
+                    if (generoCriado) {
 
-                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items.created_genre = lastId
+                        MESSAGES.DEFAULT_HEADER.status                  = MESSAGES.SUCCESS_CREATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code             = MESSAGES.SUCCESS_CREATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message                 = MESSAGES.SUCCESS_CREATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.created_genre     = generoCriado
 
                         return MESSAGES.DEFAULT_HEADER
 
@@ -168,16 +169,17 @@ const atualizarGenero = async (id, genero, contentType) => {
 
                     //Processamento
                     //Chamando função para inserir o genero no BD
-                    let result = await generoDAO.setUpdateGenres(id, genero)
+                    let resultGenero = await generoDAO.setUpdateGenres(id, genero)
 
-                    if (result) {
+                    if (resultGenero) {
 
-                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATE_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATE_ITEM.message
-                        
-                        let genre = genero.nome_genero
-                        MESSAGES.DEFAULT_HEADER.items.updated_genre = {id, genre}
+                        let generoAtualizado = await buscarGeneroId(id)
+
+
+                        MESSAGES.DEFAULT_HEADER.status                  = MESSAGES.SUCCESS_UPDATE_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code             = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message                 = MESSAGES.SUCCESS_UPDATE_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.updated_genre     = generoAtualizado.items.genre
 
                         return MESSAGES.DEFAULT_HEADER //200
 
@@ -219,18 +221,18 @@ const excluirGenero = async (id) => {
 
     try {
         
-        let validarId = buscarGeneroId()
+        let validarId = await buscarGeneroId(id)
 
         if (validarId) {
 
-            let result = generoDAO.setDeleteGenre(id) 
+            let result = await generoDAO.setDeleteGenre(id) 
 
             if (result) {
 
-                MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_DELETE.status
-                MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_DELETE.status_code
-                MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_DELETE.message
-                delete MESSAGES.DEFAULT_HEADER.items
+                MESSAGES.DEFAULT_HEADER.status                  = MESSAGES.SUCCESS_DELETE.status
+                MESSAGES.DEFAULT_HEADER.status_code             = MESSAGES.SUCCESS_DELETE.status_code
+                MESSAGES.DEFAULT_HEADER.message                 = MESSAGES.SUCCESS_DELETE.message
+                MESSAGES.DEFAULT_HEADER.items.deleted_genre     = validarId.items.genre
 
                 return MESSAGES.DEFAULT_HEADER //200
 
@@ -245,6 +247,7 @@ const excluirGenero = async (id) => {
         }
 
     } catch (error) {
+        console.log(error)
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 
@@ -255,7 +258,7 @@ const validarDadosGenero = async (genero) => {
     // Cópia do objeto DEFAULT_MESSAGES
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
-    if (genero.nome_genero == "" || genero.nome_genero == undefined || genero.nome_genero == null || genero.nome_genero.length > 30) {
+    if (genero.nome == "" || genero.nome == undefined || genero.nome == null || genero.nome.length > 30) {
 
         MESSAGES.ERROR_REQUIRED_FIELDS.message += ' [NOME INCORRETO]'
         return MESSAGES.ERROR_REQUIRED_FIELDS
