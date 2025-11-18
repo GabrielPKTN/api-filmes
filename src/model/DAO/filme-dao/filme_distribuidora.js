@@ -27,14 +27,14 @@ const prisma = new PrismaClient()
     //e executa tratamentos com segurança
 
 // Retorna todos os filmes e distribuidoras da tabela
-const getSelectAllFilmsDistributor = async () => {
+const getSelectAllMoviesDistributor = async () => {
 
     try {
 
         sql = "select * from tb_filme_distribuidora"
 
         result = await prisma.$queryRawUnsafe(sql)
-
+        
         if (Array.isArray(result)) {
             
             return result
@@ -54,14 +54,14 @@ const getSelectAllFilmsDistributor = async () => {
 }
 
 // Retorna o filme com a distribuidora pelo id
-const getSelectFilmsDistributorsById = async (id) => {
+const getSelectMoviesDistributorsById = async (id) => {
 
     try {
         
         sql = `select * from tb_filme_distribuidora where id = ${id}`
 
         result = await prisma.$queryRawUnsafe(sql)
-
+        
         if (Array.isArray(result)) {
             
             return result
@@ -81,7 +81,7 @@ const getSelectFilmsDistributorsById = async (id) => {
 }
 
 // Retorna o retorna um lista de distribuidoras filtrando pelo id do filme
-const getSelectDistributorsByIdFilms = async (filmId) => {
+const getSelectDistributorsByIdMovies = async (movie_id) => {
 
     try {
         
@@ -92,12 +92,12 @@ const getSelectDistributorsByIdFilms = async (filmId) => {
 		            from tb_filme_distribuidora
                             
 			            join tb_filme on
-                            tb_filme.id = tb_filme_distribuidora.filme_id
+                            tb_filme.id = tb_filme_distribuidora.id_filme
 
 			            join tb_distribuidora on
-				            tb_distribuidora.id = tb_filme_distribuidora.distribuidora_id
+				            tb_distribuidora.id = tb_filme_distribuidora.id_distribuidora
 
-			            where tb_filme.id = ${filmId}`
+			            where tb_filme.id = ${movie_id}`
         
         result = await prisma.$queryRawUnsafe(sql)
         
@@ -112,13 +112,14 @@ const getSelectDistributorsByIdFilms = async (filmId) => {
         }
 
     } catch (error) {
+        
         return false
     }    
 
 }
 
 // Retorna uma lista de filmes filtrando pelo id da distribuidora
-const getSelectFilmsByIdDistributors = async (distributorId) => {
+const getSelectMoviesByIdDistributors = async (distributor_id) => {
 
     try {
         const sql = `select
@@ -128,15 +129,15 @@ const getSelectFilmsByIdDistributors = async (distributorId) => {
 		            from tb_filme_distribuidora
                             
 			            join tb_filme on
-                            tb_filme.id = tb_filme_distribuidora.filme_id
+                            tb_filme.id = tb_filme_distribuidora.id_filme
 
 			            join tb_distribuidora on
-				            tb_distribuidora.id = tb_filme_distribuidora.distribuidora_id
+				            tb_distribuidora.id = tb_filme_distribuidora.id_distribuidora
 
-			            where tb_distribuidora.id = ${distributorId}`
+			            where tb_distribuidora.id = ${distributor_id}`
 
         result = await prisma.$queryRawUnsafe(sql)
-
+        
         if (Array.isArray(result)) {
                             
             return result
@@ -155,7 +156,7 @@ const getSelectFilmsByIdDistributors = async (distributorId) => {
 }
 
 // Retorna o último id de filme com distribuidora registrado na tabela
-const getSelectLastId = async () => {
+const getSelectLastMovieDistributor = async () => {
 
     try {
         
@@ -182,15 +183,19 @@ const getSelectLastId = async () => {
 }
 
 // Registra um gênero na tabela
-const setInsertFilmsDistributors = async (filmDistributor) => {
+const setInsertMoviesDistributors = async (film_distributor) => {
     
     try {
         
-        sql = `INSERT INTO tb_filme_distribuidora(id_distribuidora, id_filme) 
-            VALUES (
-                '${filmDistributor.id_filme}',
-                '${filmDistributor.id_distribuidora}'
-            );`
+        sql = `insert into tb_filme_distribuidora(
+                id_filme, 
+                id_distribuidora
+            ) 
+            values (
+                ${film_distributor.id_filme},
+                ${film_distributor.id_distribuidora}
+            )`
+
 
         result = await prisma.$executeRawUnsafe(sql)
 
@@ -199,13 +204,13 @@ const setInsertFilmsDistributors = async (filmDistributor) => {
             return result
 
         } else {
-
+            
             return false
 
         }
 
     } catch (error) {
-
+        
         return false
 
     }
@@ -214,18 +219,19 @@ const setInsertFilmsDistributors = async (filmDistributor) => {
 }
 
 // Atualiza o registro de um filme com distribuidora na tabela pelo id
-const setUpdateFilmsDistributors = async (filmDistributor) => {
+const setUpdateMoviesDistributors = async (id, film_distributor) => {
 
     try {
         
         let sql =  `update tb_filme_distribuidora set  
                     
-                    id_filme = '${filmDistributor.id_filme}',
-                    id_distribuidora = '${filmDistributor.id_distribuidora}
+                    id_filme = ${film_distributor.id_filme},
+                    id_distribuidora = ${film_distributor.id_distribuidora}
 
-                    where filme_distribuidora_id  = ${filmDistributor.id}`
+                    where id  = ${id}`
 
         let result = await prisma.$executeRawUnsafe(sql)
+        
 
         if(result) {
             return result
@@ -237,19 +243,17 @@ const setUpdateFilmsDistributors = async (filmDistributor) => {
         return false
     }
 
-    
-
 }
 
 // Deleta um registro da tabela filme_distribuidora pelo id
-const setDeleteFilmsDistributors = async (id) => {
+const setDeleteMoviesDistributors = async (id) => {
 
     try {
 
         let sql = `delete from tb_filme_distribuidora where id = ${id}`
 
-        let result = prisma.$executeRawUnsafe(sql)
-
+        let result = await prisma.$executeRawUnsafe(sql)
+        
         if (result) {
             return result
         } else {
@@ -264,13 +268,13 @@ const setDeleteFilmsDistributors = async (id) => {
 
 module.exports = {
 
-    getSelectAllFilmsDistributor,
-    getSelectFilmsDistributorsById,
-    getSelectDistributorsByIdFilms,
-    getSelectFilmsByIdDistributors,
-    getSelectLastId,
-    setInsertFilmsDistributors,
-    setUpdateFilmsDistributors,
-    setDeleteFilmsDistributors
+    getSelectAllMoviesDistributor,
+    getSelectMoviesDistributorsById,
+    getSelectDistributorsByIdMovies,
+    getSelectMoviesByIdDistributors,
+    getSelectLastMovieDistributor,
+    setInsertMoviesDistributors,
+    setUpdateMoviesDistributors,
+    setDeleteMoviesDistributors
     
 }

@@ -16,14 +16,14 @@ const listarFilmesDistribuidoras = async () => {
         // Cópia do objeto DEFAULT_MESSAGES
         let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
-        let result = await filmeDistribuidoraDAO.getSelectAllFilmsDistributor()
+        let result = await filmeDistribuidoraDAO.getSelectAllMoviesDistributor()
 
         if (result) {
             if (result.length > 0) {
 
                 MESSAGES.DEFAULT_HEADER.status = DEFAULT_MESSAGES.SUCCESS_REQUEST.status
                 MESSAGES.DEFAULT_HEADER.status_code = DEFAULT_MESSAGES.SUCCESS_REQUEST.status_code
-                MESSAGES.DEFAULT_HEADER.items.distributors = result
+                MESSAGES.DEFAULT_HEADER.items.movie_distributor = result
 
                 return MESSAGES.DEFAULT_HEADER
 
@@ -55,7 +55,7 @@ const buscarFilmeDistribuidoraId = async (id) => {
 
         if (!isNaN(id) && id != '' && id != null && id > 0) {
 
-            let result = await filmeDistribuidoraDAO.getSelectFilmsDistributorsById(id)
+            let result = await filmeDistribuidoraDAO.getSelectMoviesDistributorsById(id)
 
             if (result) {
                 if (result.length > 0) {
@@ -100,7 +100,7 @@ const listarDistribuidorasFilmeId = async (idFilme) => {
 
         if (!isNaN(idFilme) && idFilme != '' && idFilme != null && idFilme > 0) {
 
-            let result = await filmeDistribuidoraDAO.getSelectDistributorsByIdFilms(idFilme)
+            let result = await filmeDistribuidoraDAO.getSelectDistributorsByIdMovies(idFilme)
 
             if (result) {
                 if (result.length > 0) {
@@ -136,7 +136,6 @@ const listarDistribuidorasFilmeId = async (idFilme) => {
 
 const listarFilmesDistribuidoraId = async (distribuidoraId) => {
 
-
     // Cópia do objeto DEFAULT_MESSAGES
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -144,14 +143,14 @@ const listarFilmesDistribuidoraId = async (distribuidoraId) => {
 
         if (!isNaN(distribuidoraId) && distribuidoraId != '' && distribuidoraId != null && distribuidoraId > 0) {
 
-            let result = await filmeDistribuidoraDAO.getSelectFilmsByIdDistributors(distribuidoraId)
+            let result = await filmeDistribuidoraDAO.getSelectMoviesByIdDistributors(distribuidoraId)
 
             if (result) {
                 if (result.length > 0) {
 
                     MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_REQUEST.status
                     MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_REQUEST.status_code
-                    MESSAGES.DEFAULT_HEADER.items.films = result
+                    MESSAGES.DEFAULT_HEADER.items.movies = result
 
                     return MESSAGES.DEFAULT_HEADER //200
 
@@ -189,25 +188,24 @@ const inserirFilmeDistribuidora = async (filmeDistribuidora, contentType) => {
         if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
 
             let validar = await validarDadosFilmeDistribuidora(filmeDistribuidora)
-
+            
             if (!validar) {
 
                 //Processamento
                 //Chamando função para inserir o genero no BD
-                let result = await filmeDistribuidoraDAO.setInsertFilmsDistributors(filmeDistribuidora)
-
+                let result = await filmeDistribuidoraDAO.setInsertMoviesDistributors(filmeDistribuidora)
+                
                 if (result) {
 
-                    let lastId = await filmeDistribuidoraDAO.getSelectLastId()
-
-                    if (lastId) {
+                    let filmeDistribuidoraCriado = await filmeDistribuidoraDAO.getSelectLastMovieDistributor()
+                    
+                    if (filmeDistribuidoraCriado) {
                         
-                        filmeDistribuidora.id = lastId.id
-                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_CREATED_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_CREATED_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_CREATED_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items.created_film_distributor = filmeDistribuidora
-
+                        MESSAGES.DEFAULT_HEADER.status                              = MESSAGES.SUCCESS_CREATED_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code                         = MESSAGES.SUCCESS_CREATED_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message                             = MESSAGES.SUCCESS_CREATED_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.created_movie_distributor     = filmeDistribuidoraCriado
+                        
                         return MESSAGES.DEFAULT_HEADER //201
 
                     } else {
@@ -248,25 +246,25 @@ const atualizarFilmeDistribuidora = async (id, filmeDistribuidora, contentType) 
         if (String(contentType).toUpperCase() == 'APPLICATION/JSON') {
 
             let validar = await validarDadosFilmeDistribuidora(filmeDistribuidora)
-
+            
             if (!validar) {
 
                 let validarId = await buscarFilmeDistribuidoraId(id)
-
+                
                 if (validarId.status_code == 200) {
-
-                    filmeDistribuidora.id = id
 
                     //Processamento
                     //Chamando função para inserir o genero no BD
-                    let result = await filmeDistribuidoraDAO.setUpdateFilmsDistributors(id, filmeDistribuidora)
-
+                    let result = await filmeDistribuidoraDAO.setUpdateMoviesDistributors(id, filmeDistribuidora)
+                    
                     if (result) {
 
-                        MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_UPDATE_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_UPDATE_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items.film_distributor = filmeDistribuidora
+                        let filmeDistribuidoraAtualizado = await buscarFilmeDistribuidoraId(id)
+
+                        MESSAGES.DEFAULT_HEADER.status                          = MESSAGES.SUCCESS_UPDATE_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code                     = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message                         = MESSAGES.SUCCESS_UPDATE_ITEM.message
+                        MESSAGES.DEFAULT_HEADER.items.updated_film_distributor  = filmeDistribuidoraAtualizado.items.distributor
 
                         return MESSAGES.DEFAULT_HEADER //200
 
@@ -295,7 +293,7 @@ const atualizarFilmeDistribuidora = async (id, filmeDistribuidora, contentType) 
         }
 
     } catch (error) {
-
+        
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
 
     }
@@ -308,18 +306,18 @@ const excluirFilmeDistribuidora = async (id) => {
 
     try {
         
-        let validarId = buscarFilmeDistribuidoraId()
+        let validarId = await buscarFilmeDistribuidoraId(id)
 
-        if (validarId) {
+        if (validarId.status_code == 200) {
 
-            let result = filmeDistribuidoraDAO.setDeleteFilmsGenres(id) 
+            let result = await filmeDistribuidoraDAO.setDeleteMoviesDistributors(id) 
 
             if (result) {
 
                 MESSAGES.DEFAULT_HEADER.status = MESSAGES.SUCCESS_DELETE.status
                 MESSAGES.DEFAULT_HEADER.status_code = MESSAGES.SUCCESS_DELETE.status_code
                 MESSAGES.DEFAULT_HEADER.message = MESSAGES.SUCCESS_DELETE.message
-                delete MESSAGES.DEFAULT_HEADER.items
+                MESSAGES.DEFAULT_HEADER.items.deleted_movie_distributor = validarId.items.distributor
 
                 return MESSAGES.DEFAULT_HEADER //200
 
@@ -361,6 +359,10 @@ const validarDadosFilmeDistribuidora = async (filmeDistribuidora) => {
     }
 
 }
+
+// 4 21 23
+// inserirFilmeDistribuidora(teste_json, "APPLICATION/JSON")
+excluirFilmeDistribuidora(20)
 
 module.exports = {
 

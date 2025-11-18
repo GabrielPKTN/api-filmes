@@ -12,8 +12,12 @@ const filmeDAO = require("../../model/DAO/filme-dao/filme.js")
 // Import da controller da relação entre filme e gênero
 const filmeGeneroController = require("./controller_filme_genero.js")
 
+// Import da controller da relação entre filme e distribuidora
+const filmeDistribuidoraController = require("./controller_filme_distribuidora.js")
+
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
+// Lista os todos os filmes
 const listarFilmes = async () => {
     
     // Cópia do objeto DEFAULT_MESSAGES
@@ -32,12 +36,16 @@ const listarFilmes = async () => {
                 
                 for (let filme of resultFilmes) {
                     
-                    let result = await filmeGeneroController.listarGenerosFilmeId(filme.id)
+                    let resultFilmeGenero = await filmeGeneroController.listarGenerosFilmeId(filme.id)
 
-                    if (result.status_code == 200) {
-                        filme.genero = result.items.movie_genres
+                    if (resultFilmeGenero.status_code == 200) {
+                        filme.genero = resultFilmeGenero.items.movie_genres
                     }
-                    
+
+                    let resultFilmeDistribuidora = await filmeDistribuidoraController.listarDistribuidorasFilmeId(filme.id)
+                    if (resultFilmeDistribuidora.status_code == 200) {
+                        filme.distribuidora = resultFilmeDistribuidora.items.distributors
+                    }
                 }
                 
                 MESSAGES.DEFAULT_HEADER.items.filme = resultFilmes    
@@ -59,6 +67,7 @@ const listarFilmes = async () => {
 
 }
 
+// Busca um filme pelo id
 const buscarFilmeId = async (id) => {
     // Cópia do objeto DEFAULT_MESSAGES
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -78,12 +87,21 @@ const buscarFilmeId = async (id) => {
                     for (let filme of resultFilme) {
 
                         id_filme = filme.id
+
                         resultFilmeGenero = await filmeGeneroController.listarGenerosFilmeId(id_filme)
 
                         if (resultFilmeGenero.status_code == 200) {
                             
                             filme.genero = resultFilmeGenero.items.movie_genres
                             
+                        }
+
+                        resultFilmeDistribuidora = await filmeDistribuidoraController.listarDistribuidorasFilmeId(id_filme)
+
+                        if (resultFilmeDistribuidora.status_code == 200) {
+
+                            filme.distribuidora = resultFilmeDistribuidora.items.distributors
+
                         }
 
                     }
@@ -150,9 +168,29 @@ const inserirFilme = async (filme, contentType) => {
                             let resultFilmesGenero = await filmeGeneroController.inserirFilmeGenero(filmeGenero, contentType)
                             
                             if(resultFilmesGenero.status_code != 201) {
+                                MESSAGES.ERROR_RELATINAL_INSERTION.message += " [FILME E GÊNERO]"
                                 return MESSAGES.ERROR_RELATINAL_INSERTION // 500 Problema na tabela de relação
                             }
                         }
+
+                        //Processar a inserção dos dados na tabela de relação 
+                        //entre filme e distribuidora
+
+                        for (let distribuidora of filme.distribuidora) {
+
+                            // Cria o json com o id do filme, e o id da distribuidora.
+                            let filmeDistribuidora = { id_filme: filmeCriado[0].id, id_distribuidora: distribuidora.id }
+
+                            // Encaminha JSON com o id do filme, e o id da distribuidora.
+                            let resultFilmeDistribuidora = await filmeDistribuidoraController.inserirFilmeDistribuidora(filmeDistribuidora, contentType)
+                            
+                            if(resultFilmeDistribuidora.status_code != 201) {
+                                MESSAGES.ERROR_RELATINAL_INSERTION.message += " [FILME E DISTRIBUIDORA]"
+                                return MESSAGES.ERROR_RELATINAL_INSERTION // 500 Problema na tabela de relação
+                            }
+
+                        }
+
 
                         filme = filmeCriado[0]
 
@@ -172,6 +210,15 @@ const inserirFilme = async (filme, contentType) => {
 
                         // Cria novamento o atributo genero mas agora com id e nome.
                         filme.genero = resultFilmeGenero.items.movie_genres
+
+                        // deleta o atributo distribuidora de filme
+                        delete filme.distribuidora
+
+                        // Pesquisa no banco de dados todos as distribuidoras atribuidos ao filme
+                        let resultFilmeDistribuidora = await filmeDistribuidoraController.listarDistribuidorasFilmeId(filmeCriado[0].id)
+
+                        // Cria novamente o atributo distribuidora mas agora com id e nome.
+                        filme.distribuidora = resultFilmeDistribuidora.items.distributors
 
                         MESSAGES.DEFAULT_HEADER.items.created_movie = filme
 
@@ -203,7 +250,7 @@ const inserirFilme = async (filme, contentType) => {
 
 }
 
-//Atuualiza um filme pelo ID
+// Atuualiza um filme pelo ID
 const atualizarFilme = async (filme, id, contentType) => {
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -219,18 +266,14 @@ const atualizarFilme = async (filme, id, contentType) => {
 
                 if(validarId.status_code == 200) {
 
-                    filme.id = Number(id)
-
-                    let resultFilme = await filmeDAO.setUpdateMovies(filme)
+                    let resultFilme = await filmeDAO.setUpdateMovies(id, filme)
 
                     if (resultFilme) {
 
-                        let filmeAtualizado = await buscarFilmeId(id)
-
-                        /********PARTE RESPONSAVEL POR ATUALIZAR OS GENEROS DO FILME*********/
+                        /****PARTE RESPONSAVEL POR ATUALIZAR OS ATRIBUTOS RELACIONAMENTOS****/
 
                         //Pega todas relações entre filme e genero
-                        let filmesGeneros = await filmeGeneroController.listarFilmesGeneros();
+                        let filmesGeneros = await filmeGeneroController.listarFilmesGeneros()
                         
                         //Pega somente o array onde contem os registros
                         let listaFilmesGeneros = filmesGeneros.items.movies_genres
@@ -249,6 +292,7 @@ const atualizarFilme = async (filme, id, contentType) => {
                                 let resultDeleteFilmeGenero = await filmeGeneroController.excluirFilmeGenero(idFilmeGenero)
 
                                 if(resultDeleteFilmeGenero.status_code != 200) {
+                                    MESSAGES.ERROR_RELATINAL_INSERTION.message += " [FILME E GÊNERO]" 
                                     return MESSAGES.ERROR_RELATINAL_INSERTION // 500 Problema na tabela de relação
                                 }
                             }
@@ -267,6 +311,48 @@ const atualizarFilme = async (filme, id, contentType) => {
                             }
 
                         }
+
+                        //Pega todas relações entre filme e distribuidora
+                        let filmesDistribuidoras = await filmeDistribuidoraController.listarFilmesDistribuidoras()
+
+                        //Pega somente o array onde contem os registros
+                        let listaFilmesDistribuidoras = filmesDistribuidoras.items.movie_distributor
+
+                        //Para cada relação dentro do array de relações...
+                        for (let filmeDistribuidora of listaFilmesDistribuidoras) {
+                            // Caso a relação contenha o mesmo id do filme que 
+                            // está sendo atualizado...
+                            if (filmeDistribuidora.id_filme == id) {
+
+                                // Coleta o id da relação...
+                                let idFilmeDistribuidora = filmeDistribuidora.id
+                                
+                                // E deleta.
+                                let resultDeleteFilmeDistribuidora = await filmeDistribuidoraController.excluirFilmeDistribuidora(idFilmeDistribuidora)
+
+                                if(resultDeleteFilmeDistribuidora.status_code != 200) {
+                                    MESSAGES.ERROR_RELATINAL_INSERTION.message += " [FILME E DISTRIBUIDORA]"
+                                    return MESSAGES.ERROR_RELATINAL_INSERTION // 500 Problema na tabela de relação
+                                }
+                            }
+                        }
+
+                        // Em seguida, se realiza o mesmo processo do insert...
+                        for (let distribuidora of filme.distribuidora) {
+
+                            // Cria o json com o id do filme, e o id da distribuidora.
+                            let filmeDistribuidora = { id_filme: Number(id), id_distribuidora: distribuidora.id }
+
+                            // Encaminha JSON com o id do filme, e o id da distribuidora.
+                            let resultFilmeDistribuidora = await filmeDistribuidoraController.inserirFilmeDistribuidora(filmeDistribuidora, contentType)
+                            
+                            if(resultFilmeDistribuidora.status_code != 201) {
+                                MESSAGES.ERROR_RELATINAL_INSERTION.message += " [FILME E DISTRIBUIDORA]"
+                                return MESSAGES.ERROR_RELATINAL_INSERTION // 500 Problema na tabela de relação
+                            }
+
+                        }
+
                         /********************************************************************/
 
                         MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_UPDATE_ITEM.status
@@ -280,6 +366,12 @@ const atualizarFilme = async (filme, id, contentType) => {
                         
                         // Cria novamento o atributo genero mas agora com id e nome.
                         filme.genero = resultFilmeGenero.items.movie_genres
+
+                        delete filme.distribuidora
+
+                        let resultFilmeDistribuidora = await filmeDistribuidoraController.listarDistribuidorasFilmeId(id)
+
+                        filme.distribuidora = resultFilmeDistribuidora.items.distributors
 
                         MESSAGES.DEFAULT_HEADER.items.updated_movie = filme
                         return MESSAGES.DEFAULT_HEADER //200
@@ -309,7 +401,7 @@ const atualizarFilme = async (filme, id, contentType) => {
     }
 }
 
-//Exclui um filme pelo ID
+// Exclui um filme pelo ID
 const excluirFilme = async (id) => {
 
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
@@ -337,6 +429,7 @@ const excluirFilme = async (id) => {
     }
 }
 
+// Valida os dados vindos da requisição
 const validarDadosFilme = async function (filme) {
 
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
