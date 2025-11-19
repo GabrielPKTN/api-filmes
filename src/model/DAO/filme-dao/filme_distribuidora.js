@@ -80,7 +80,7 @@ const getSelectMoviesDistributorsById = async (id) => {
 
 }
 
-// Retorna o retorna um lista de distribuidoras filtrando pelo id do filme
+// Retorna uma lista de distribuidoras filtrando pelo id do filme
 const getSelectDistributorsByIdMovies = async (movie_id) => {
 
     try {
