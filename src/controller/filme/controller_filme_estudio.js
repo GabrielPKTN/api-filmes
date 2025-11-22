@@ -10,7 +10,6 @@ const filmeEstudioDAO = require("../../model/DAO/filme-dao/filme_estudio.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 const controllerEstudio = require("../estudio/controller_estudio.js")
-const controllerFilme = require("./controller_filme.js")
 
 //Lista todos as relações entre filme e estudio.
 const listarFilmesEstudios = async () => {
@@ -25,9 +24,11 @@ const listarFilmesEstudios = async () => {
 
             if(resultFilmeEstudio.length > 0) {
 
-                MESSAGES.DEFAULT_HEADER.status                  = MESSAGES.SUCCES_REQUEST.status
-                MESSAGES.DEFAULT_HEADER.status_code             = MESSAGES.SUCCES_REQUEST.status_code 
+                MESSAGES.DEFAULT_HEADER.status                  = MESSAGES.SUCCESS_REQUEST.status
+                MESSAGES.DEFAULT_HEADER.status_code             = MESSAGES.SUCCESS_REQUEST.status_code 
                 MESSAGES.DEFAULT_HEADER.items.movie_studio      = resultFilmeEstudio
+
+                return MESSAGES.DEFAULT_HEADER
 
             } else {
                 return MESSAGES.ERROR_NOT_FOUND // 404
@@ -58,8 +59,8 @@ const listarFilmeEstudioId = async (id) => {
 
                 if (resultFilmeEstudio.length > 0) {
 
-                    MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCES_REQUEST.status
-                    MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCES_REQUEST.status_code
+                    MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_REQUEST.status
+                    MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCESS_REQUEST.status_code
                     MESSAGES.DEFAULT_HEADER.items.movie_studio  = resultFilmeEstudio
 
                     return MESSAGES.DEFAULT_HEADER // 201
@@ -99,8 +100,8 @@ const listarFilmesEstudioId = async (id_estudio) => {
 
                 if (resultFilmeEstudio.length > 0) {
 
-                    MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCES_REQUEST.status
-                    MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCES_REQUEST.status_code
+                    MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_REQUEST.status
+                    MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCESS_REQUEST.status_code
                     MESSAGES.DEFAULT_HEADER.items.movie_studio  = resultFilmeEstudio
 
                     return MESSAGES.DEFAULT_HEADER // 201
@@ -129,10 +130,8 @@ const listarEstudiosFilmeId = async (id_filme) => {
     MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
     try {
-        
-        validarIdFilme = await controllerFilme.buscarFilmeId(id_filme)
 
-        if (validarIdEstudio.status_code == 200) {
+        if (!isNaN(id_filme) && id_filme != '' && id_filme != null && id_filme > 0) {
 
             resultFilmeEstudio = await filmeEstudioDAO.getSelectStudiosByMovieId(id_filme)
 
@@ -140,8 +139,8 @@ const listarEstudiosFilmeId = async (id_filme) => {
 
                 if (resultFilmeEstudio.length > 0) {
 
-                    MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCES_REQUEST.status
-                    MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCES_REQUEST.status_code
+                    MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_REQUEST.status
+                    MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCESS_REQUEST.status_code
                     MESSAGES.DEFAULT_HEADER.items.movie_studio  = resultFilmeEstudio
 
                     return MESSAGES.DEFAULT_HEADER // 201
@@ -189,6 +188,8 @@ const insereFilmeEstudio = async (filme_estudio, contentType) => {
                         MESSAGES.DEFAULT_HEADER.status_code                     = MESSAGES.SUCCESS_CREATED_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message                         = MESSAGES.SUCCESS_CREATED_ITEM.message
                         MESSAGES.DEFAULT_HEADER.items.movie_studio_created      = filmeInserido
+
+                        return MESSAGES.DEFAULT_HEADER
 
                     } else {    
                         return MESSAGES.ERROR_INTERNAL_SERVER_MODEL // 500
@@ -298,6 +299,8 @@ const deleteFilmeEstudio = async (id) => {
                 MESSAGES.DEFAULT_HEADER.message                         = MESSAGES.SUCCESS_DELETE.message
                 MESSAGES.DEFAULT_HEADER.items.deleted_movie_studio      = validarId
 
+                return MESSAGES.DEFAULT_HEADER
+
             } else {
                 return MESSAGES.ERROR_INTERNAL_SERVER_MODEL // 500
             }
@@ -313,7 +316,7 @@ const deleteFilmeEstudio = async (id) => {
 }
 
 //Valida dados vindos do json da requisição.
-const validarDadosFilmeEstudio = async (filme_estudio) => {
+const validarDadosFilmeEstudio = (filme_estudio) => {
 
     MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 

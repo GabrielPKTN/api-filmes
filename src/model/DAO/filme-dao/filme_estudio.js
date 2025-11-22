@@ -85,7 +85,7 @@ const getSelectStudiosByMovieId = async  (movie_id) => {
                 
             where tb_filme.id = ${movie_id}`
 
-        result = await prisma.$executeRawUnsafe(sql)
+        result = await prisma.$queryRawUnsafe(sql)
 
         if (Array.isArray(result)) {
             return result
@@ -155,8 +155,9 @@ const getSelectLastMovieStudio = async () => {
 //Insere um registro de relação entre filme e estudio.
 const setInsertMovieStudio = async (movie_studio) => {
 
-    sql `insert into tb_filme_estudio(
-        nome
+    sql = `insert into tb_filme_estudio(
+        id_filme,
+        id_estudio
     ) values (
         ${movie_studio.id_filme},
         ${movie_studio.id_estudio} 

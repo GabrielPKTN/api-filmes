@@ -15,6 +15,9 @@ const filmeGeneroController = require("./controller_filme_genero.js")
 // Import da controller da relação entre filme e distribuidora
 const filmeDistribuidoraController = require("./controller_filme_distribuidora.js")
 
+// Import da controller da relação entre filme e estudio
+const filmeEstudioController = require("./controller_filme_estudio.js")
+
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 // Lista os todos os filmes
@@ -46,6 +49,13 @@ const listarFilmes = async () => {
                     if (resultFilmeDistribuidora.status_code == 200) {
                         filme.distribuidora = resultFilmeDistribuidora.items.distributors
                     }
+
+                    resultFilmeEstudio = await filmeEstudioController.listarEstudiosFilmeId(filme.id)
+                    
+                    if (resultFilmeEstudio.status_code == 200) {
+                        filme.estudio = resultFilmeEstudio.items.movie_studio
+                    }
+
                 }
                 
                 MESSAGES.DEFAULT_HEADER.items.filme = resultFilmes    
@@ -103,6 +113,14 @@ const buscarFilmeId = async (id) => {
                             filme.distribuidora = resultFilmeDistribuidora.items.distributors
 
                         }
+
+                        resultFilmeEstudio = await filmeEstudioController.listarEstudiosFilmeId(id_filme)
+
+                        if (resultFilmeEstudio.status_code == 200) [
+
+                            filme.estudio = resultFilmeEstudio.items.movie_studio
+
+                        ]
 
                     }
 
@@ -191,6 +209,21 @@ const inserirFilme = async (filme, contentType) => {
 
                         }
 
+                        for (let estudio of filme.estudio) {
+
+                            // Cria o json com o id do filme, e o id da distribuidora.
+                            let filmeEstudio = { id_filme: filmeCriado[0].id, id_estudio: estudio.id }
+
+                            // Encaminha JSON com o id do filme, e o id da distribuidora.
+                            let resultFilmeEstudio = await filmeEstudioController.insereFilmeEstudio(filmeEstudio, contentType)
+
+                            if(resultFilmeEstudio.status_code != 201) {
+                                MESSAGES.ERROR_RELATINAL_INSERTION.message += " [FILME E ESTUDIO]"
+                                return MESSAGES.ERROR_RELATINAL_INSERTION // 500 Problema na tabela de relação
+                            }
+
+                        }
+
 
                         filme = filmeCriado[0]
 
@@ -219,6 +252,17 @@ const inserirFilme = async (filme, contentType) => {
 
                         // Cria novamente o atributo distribuidora mas agora com id e nome.
                         filme.distribuidora = resultFilmeDistribuidora.items.distributors
+
+                        delete filme.estudio 
+
+                        let resultFilmeEstudio = await filmeEstudioController.listarEstudiosFilmeId(filmeCriado[0].id)
+
+                        filme.estudio = resultFilmeEstudio.items.movie_studio
+
+
+
+
+
 
                         MESSAGES.DEFAULT_HEADER.items.created_movie = filme
 
@@ -345,7 +389,6 @@ const atualizarFilme = async (filme, id, contentType) => {
 
                             // Encaminha JSON com o id do filme, e o id da distribuidora.
                             let resultFilmeDistribuidora = await filmeDistribuidoraController.inserirFilmeDistribuidora(filmeDistribuidora, contentType)
-                            
                             if(resultFilmeDistribuidora.status_code != 201) {
                                 MESSAGES.ERROR_RELATINAL_INSERTION.message += " [FILME E DISTRIBUIDORA]"
                                 return MESSAGES.ERROR_RELATINAL_INSERTION // 500 Problema na tabela de relação
@@ -353,11 +396,49 @@ const atualizarFilme = async (filme, id, contentType) => {
 
                         }
 
-                        /********************************************************************/
+                        //Pega todas relações entre filme e distribuidora
+                        let filmesEstudios = await filmeEstudioController.listarFilmesEstudios()
 
-                        MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_UPDATE_ITEM.status
-                        MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
-                        MESSAGES.DEFAULT_HEADER.message             = MESSAGES.SUCCESS_UPDATE_ITEM.message
+                        //Pega somente o array onde contem os registros
+                        let listarFilmesEstudios = filmesEstudios.items.movie_studio
+
+                        //Para cada relação dentro do array de relações...
+                        for (let filmeEstudio of listarFilmesEstudios) {
+                            // Caso a relação contenha o mesmo id do filme que 
+                            // está sendo atualizado...
+                            if (filmeEstudio.id_filme == id) {
+
+                                // Coleta o id da relação...
+                                let idFilmeEstudio = filmeEstudio.id
+                                
+                                // E deleta.
+                                let resultDeleteFilmeEstudio = await filmeEstudioController.deleteFilmeEstudio(idFilmeEstudio)
+
+                                if(resultDeleteFilmeEstudio.status_code != 200) {
+                                    MESSAGES.ERROR_RELATINAL_INSERTION.message += " [FILME E ESTUDIO]"
+                                    return MESSAGES.ERROR_RELATINAL_INSERTION // 500 Problema na tabela de relação
+                                }
+                            }
+                        }
+
+                        // Em seguida, se realiza o mesmo processo do insert...
+                        for (let estudio of filme.estudio) {
+
+                            // Cria o json com o id do filme, e o id da distribuidora.
+                            let filmeEstudio = { id_filme: Number(id), id_estudio: estudio.id }
+
+                            // Encaminha JSON com o id do filme, e o id da distribuidora.
+                            let resultFilmeEstudio = await filmeEstudioController.insereFilmeEstudio(filmeEstudio, contentType)
+                            
+
+                            if(resultFilmeEstudio.status_code != 201) {
+                                MESSAGES.ERROR_RELATINAL_INSERTION.message += " [FILME E DISTRIBUIDORA]"
+                                return MESSAGES.ERROR_RELATINAL_INSERTION // 500 Problema na tabela de relação
+                            }
+
+                        }
+
+                        /********************************************************************/
 
                         
                         delete filme.genero
@@ -372,6 +453,17 @@ const atualizarFilme = async (filme, id, contentType) => {
                         let resultFilmeDistribuidora = await filmeDistribuidoraController.listarDistribuidorasFilmeId(id)
 
                         filme.distribuidora = resultFilmeDistribuidora.items.distributors
+
+                        delete filme.estudio
+
+                        let resultFilmeEstudio = await filmeEstudioController.listarEstudiosFilmeId(id)
+
+                        filme.estudio = resultFilmeEstudio.items.movie_studio
+
+
+                        MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_UPDATE_ITEM.status
+                        MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
+                        MESSAGES.DEFAULT_HEADER.message             = MESSAGES.SUCCESS_UPDATE_ITEM.message
 
                         MESSAGES.DEFAULT_HEADER.items.updated_movie = filme
                         return MESSAGES.DEFAULT_HEADER //200
