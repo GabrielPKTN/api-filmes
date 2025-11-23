@@ -10,6 +10,8 @@
 const profissionalDAO = require("../../model/DAO/profissional-dao/profissional.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
+const controllerProfissionalCargo = require("./controller_profissional_cargo.js")
+
 // Retorna todos os profissionais registrados no sistema
 const listarProfissionais = async () => {
 
@@ -22,6 +24,18 @@ const listarProfissionais = async () => {
         if(resultProfissional) {
 
             if (resultProfissional.length > 0) {
+
+                for (profissional of resultProfissional) {
+
+                    profissionalCargo = await controllerProfissionalCargo.listarCargosProfissionalId(profissional.id)
+
+                    if (profissionalCargo.status_code == 200) {
+
+                        profissional.cargo = profissionalCargo.items.role
+
+                    }
+
+                }
 
                 MESSAGES.DEFAULT_HEADER.status                  = MESSAGES.SUCCESS_REQUEST.status
                 MESSAGES.DEFAULT_HEADER.status_code             = MESSAGES.SUCCESS_REQUEST.status_code
@@ -57,6 +71,18 @@ const buscarProfissionalId = async (id) => {
             if(resultProfissional) {
 
                 if(resultProfissional.length > 0) {
+
+                    for (profissional of resultProfissional) {
+
+                        profissionalCargo = await controllerProfissionalCargo.listarCargosProfissionalId(profissional.id)
+
+                        if (profissionalCargo.status_code == 200) {
+
+                            profissional.cargo = profissionalCargo.items.role
+                            
+                        }
+
+                    }
 
                     MESSAGES.DEFAULT_HEADER.status                      =  MESSAGES.SUCCESS_REQUEST.status
                     MESSAGES.DEFAULT_HEADER.status_code                 =  MESSAGES.SUCCESS_REQUEST.status_code
@@ -103,10 +129,32 @@ const inserirProfissional = async (profissional, contentType) => {
 
                     if(profissionalCriado) {
 
+                        for (let cargo of profissional.cargo) {
+
+                            profissionalCargo = {id_profissional:profissionalCriado[0].id , id_cargo: cargo.id}
+
+                            resultInsertProfissionalCargo = await controllerProfissionalCargo
+                                                                    .inserirProfissionalCargo(profissionalCargo, contentType)
+
+                            if(resultInsertProfissionalCargo.status_code != 201) {
+                                MESSAGES.ERROR_RELATINAL_INSERTION += ' [PROFISSIONAL CARGO]'
+                                return MESSAGES.ERROR_RELATINAL_INSERTION
+                            }
+
+                        }
+
+                        profissional = profissionalCriado[0]
+
+                        delete profissional.cargo
+
+                        resultProfissionalCargo = await controllerProfissionalCargo.listarCargosProfissionalId(profissional.id)
+
+                        profissional.cargo = resultProfissionalCargo.items.role
+
                         MESSAGES.DEFAULT_HEADER.status                                  =   MESSAGES.SUCCESS_CREATED_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code                             =   MESSAGES.SUCCESS_CREATED_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message                                 =   MESSAGES.SUCCESS_CREATED_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items.professional_created              =   profissionalCriado
+                        MESSAGES.DEFAULT_HEADER.items.professional_created              =   profissional
 
                         return MESSAGES.DEFAULT_HEADER
 
@@ -127,7 +175,6 @@ const inserirProfissional = async (profissional, contentType) => {
         }
 
     } catch (error) {
-        console.log(error)
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 
@@ -156,11 +203,61 @@ const atualizarProfissional = async (id, profissional, contentType) => {
 
                         let profissionalAtualizado = await buscarProfissionalId(id)
 
+                        //Pega todas as relações entre profissional e cargo
+                        profissionaisCargos = await controllerProfissionalCargo.listarProfissionaisCargos()
+
+                        //Pega somente os arrays onde tem os itens
+                        listaProfissionalCargo = profissionaisCargos.items.professionals_roles
+
+                        //Para cada relação dentro desse array...
+                        for (let profissionalCargo of listaProfissionalCargo) {
+
+                            //Caso a relação tenha o atributo id_profissional igual
+                            //ao id que está sendo atualizado...
+                            if (profissionalCargo.id_profissional == id) {
+
+                                relacaoProfissionalCargo = profissionalCargo.id
+
+                                deleteRelacao = await controllerProfissionalCargo.excluirProfissionalCargo(relacaoProfissionalCargo)
+
+                                if(deleteRelacao.status_code != 200) {
+                                    MESSAGES.ERROR_RELATINAL_INSERTION.message += " [PROFISSIONAL CARGO]" 
+                                    return MESSAGES.ERROR_RELATINAL_INSERTION // 500 Problema na tabela de relação
+                                }
+
+                            }
+
+                        }
+
+                        for (let cargo of profissional.cargo) {
+
+                            profissionalCargo = {id_profissional:Number(id) , id_cargo: cargo.id}
+
+                            resultInsertProfissionalCargo = await controllerProfissionalCargo
+                                                                    .inserirProfissionalCargo(profissionalCargo, contentType)
+
+                            if(resultInsertProfissionalCargo.status_code != 201) {
+                                MESSAGES.ERROR_RELATINAL_INSERTION += ' [PROFISSIONAL CARGO]'
+                                return MESSAGES.ERROR_RELATINAL_INSERTION
+                            }
+
+                        }
+
+                        profissional = profissionalAtualizado.items.professional
+
+                        delete profissional[0].cargo
+                        
+
+                        resultProfissionalCargo = await controllerProfissionalCargo.listarCargosProfissionalId(profissional[0].id)
+
+                        profissional[0].cargo = resultProfissionalCargo.items
+
                         MESSAGES.DEFAULT_HEADER.status                              = MESSAGES.SUCCESS_UPDATE_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code                         = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message                             = MESSAGES.SUCCESS_UPDATE_ITEM.message
-                        MESSAGES.DEFAULT_HEADER.items.professional_updated          = profissionalAtualizado.items.professional
+                        MESSAGES.DEFAULT_HEADER.items.professional_updated          = profissional
                         
+
                         return MESSAGES.DEFAULT_HEADER // 200
 
                     } else {
@@ -180,7 +277,6 @@ const atualizarProfissional = async (id, profissional, contentType) => {
         }
 
     } catch (error) {
-        console.log(error)
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 
@@ -197,7 +293,28 @@ const excluirProfissional = async (id) => {
     
         if (validarId.status_code == 200) {
 
-            const result = await profissionalDAO.setDeleteProfessionalById(id)
+            relacoesProfissionalCargo = await controllerProfissionalCargo.listarProfissionaisCargos() 
+            
+            listaRelacoesProfissionalCargo = relacoesProfissionalCargo.items.professionals_roles
+
+            for (let relacao of listaRelacoesProfissionalCargo) {
+
+                if (relacao.id_profissional == id) {
+
+                    idRelacao = relacao.id
+
+                    resultDeleteProfissionalCargo = await controllerProfissionalCargo.excluirProfissionalCargo(idRelacao)
+
+                    if(resultDeleteProfissionalCargo.status_code != 200) {
+                        MESSAGES.ERROR_RELATINAL_INSERTION.message += " [PROFISSIONAL CARGO]" 
+                        return MESSAGES.ERROR_RELATINAL_INSERTION // 500 Problema na tabela de relação
+                    }
+
+                }
+
+            }
+
+            result = await profissionalDAO.setDeleteProfessionalById(id)
 
             if(result) {
 
