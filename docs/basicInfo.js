@@ -1,10 +1,9 @@
 module.exports = {
-
     "openapi": "3.0.3",
     
     "info": {
-        "title": "Projeto do SENAI Jandira - Gabriel Lacerda Correia",
-        "description": "CRUD das tabelas do BD filmes.",
+        "title": "Projeto API da Locadora de Filmes - Gabriel Lacerda Correia",
+        "description": "Documentação da API da aplicação da Locadora",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "description": "Contact developer",
@@ -16,14 +15,22 @@ module.exports = {
         },
         "version": "1.0.0"
     },
-    
+
     "externalDocs": {
         "description": "Developer portfolio",
-        "url": "gabrielpktn.github.io/portfolio/"
+        "url": "http://gabrielpktn.github.io/portfolio/"
     },
 
     "tags": [
-        
+        'EndPoints [FILMES]',
+        'EndPoints [GENERO]',
+        'EndPoints [DISTRIBUIDORA]',
+        'EndPoints [CARGO]',
+        'EndPoints [ESTUDIO]',
+        'EndPoints [PAPEL]',
+        'EndPoints [IDIOMA]',
+        'EndPoints [PROFISSIONAL]',
+        'EndPoints [EQUIPE]'
     ]
 
 }
