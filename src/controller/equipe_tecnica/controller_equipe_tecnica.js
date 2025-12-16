@@ -27,8 +27,6 @@ const listarEquipes = async () => {
                 MESSAGES.DEFAULT_HEADER.status_code             = MESSAGES.SUCCESS_REQUEST.status_code
                 MESSAGES.DEFAULT_HEADER.items.team              = resultEquipe
 
-                console.log(MESSAGES.DEFAULT_HEADER.items)
-
                 return MESSAGES.DEFAULT_HEADER // 200
 
             } else {

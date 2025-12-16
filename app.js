@@ -10,7 +10,7 @@
 const express    = require('express')        // Responsável pela API
 const cors       = require('cors')           // Responsável pelas permissões da API (APP)
 const swaggerUi = require('swagger-ui-express')
-const swaggerDocument = require('./swagger.json')
+const swaggerDocument = require('./docs/index.js')
 
 // Retorna a porta do servidor atual ou colocamos uma porta local.
 const PORT = process.PORT || 8000
@@ -37,6 +37,7 @@ const estudioRoutes = require("./src/routes/routes_estudio.js")
 const papelRoutes = require("./src/routes/routes_papel.js")
 const idiomaRoutes = require("./src/routes/routes_idioma.js")
 const profissionalRoutes = require("./src/routes/routes_profissional.js")
+const equipeTecnicaRoutes = require("./src/routes/routes_equipe_tecnica.js")
 
 // EndPoints de routes
 app.use('/v1/locadora', filmeRoutes)
@@ -47,6 +48,7 @@ app.use('/v1/locadora', estudioRoutes)
 app.use('/v1/locadora', papelRoutes)
 app.use('/v1/locadora', idiomaRoutes)
 app.use('/v1/locadora', profissionalRoutes)
+app.use('/v1/locadora', equipeTecnicaRoutes)
 
 
 // DOCUMENTAÇÃO SWAGGER!!
