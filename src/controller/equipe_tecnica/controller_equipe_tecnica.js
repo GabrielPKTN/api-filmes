@@ -10,6 +10,8 @@
 const equipeDAO = require("../../model/DAO/equipe-tecnica-dao/equipe_tecnica.js")
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
+const profissionalEquipeController = require("../profissional/controller_profissional_equipe.js")
+
 // Retorna todos os profissionais registrados no sistema
 const listarEquipes = async () => {
 
@@ -22,6 +24,17 @@ const listarEquipes = async () => {
         if(resultEquipe) {
 
             if (resultEquipe.length > 0) {
+
+                for (equipe of resultEquipe) {
+                    
+                    idEquipe = equipe.id
+                    profissionaisEquipe = await profissionalEquipeController.listarProfissionaisEquipeId(idEquipe)
+
+                    if(profissionaisEquipe.status_code == 200) {
+                        equipe.profissionais = profissionaisEquipe.items.professional
+                    }
+
+                }
 
                 MESSAGES.DEFAULT_HEADER.status                  = MESSAGES.SUCCESS_REQUEST.status
                 MESSAGES.DEFAULT_HEADER.status_code             = MESSAGES.SUCCESS_REQUEST.status_code
@@ -57,6 +70,17 @@ const buscarEquipeId = async (id) => {
             if(resultEquipe) {
 
                 if(resultEquipe.length > 0) {
+
+                    for (equipe of resultEquipe) {
+                    
+                        idEquipe = equipe.id
+                        profissionaisEquipe = await profissionalEquipeController.listarProfissionaisEquipeId(idEquipe)
+
+                        if(profissionaisEquipe.status_code == 200) {
+                            equipe.profissionais = profissionaisEquipe.items.professional
+                        }
+
+                    }
 
                     MESSAGES.DEFAULT_HEADER.status                      =  MESSAGES.SUCCESS_REQUEST.status
                     MESSAGES.DEFAULT_HEADER.status_code                 =  MESSAGES.SUCCESS_REQUEST.status_code
@@ -103,7 +127,33 @@ const inserirEquipe = async (equipe, contentType) => {
 
                     if(equipeCriada) {
 
+                        for (object of equipeCriada) {
+
+                            idEquipe = equipeCriada[0].id
+                            
+                            for(profissional of equipe.profissionais) {
+
+                                idProfissional = profissional.id_profissional
+
+                                equipeProfissionalObject = {id_profissional: idProfissional, id_equipe: idEquipe}
+
+                                resultProfissionalEquipe = await profissionalEquipeController.inserirProfissionalEquipe(equipeProfissionalObject, contentType)
+
+                                if (resultProfissionalEquipe.status_code != 201) {
+
+                                    MESSAGES.ERROR_RELATINAL_INSERTION += ' [PROFISSIONAL_EQUIPE]'
+                                    return MESSAGES.ERROR_RELATINAL_INSERTION //500
+
+                                }
+
+                            }
+
+                        }
+
                         equipe = equipeCriada[0]
+
+                        resultProfissionais = await profissionalEquipeController.listarProfissionaisEquipeId(equipe.id)
+                        equipe.profissionais = resultProfissionais.items.professional
 
                         MESSAGES.DEFAULT_HEADER.status                                  =   MESSAGES.SUCCESS_CREATED_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code                             =   MESSAGES.SUCCESS_CREATED_ITEM.status_code
@@ -129,6 +179,7 @@ const inserirEquipe = async (equipe, contentType) => {
         }
 
     } catch (error) {
+        
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 
@@ -154,6 +205,45 @@ const atualizarEquipe = async (id, equipe, contentType) => {
                     const resultEquipe = await equipeDAO.setUpdateTeam(id, equipe)
 
                     if(resultEquipe) {
+
+                        equipeResult = await buscarEquipeId(id)
+                        equipeObject = equipeResult.items.team
+
+                        relacoesResult = await profissionalEquipeController.listarRelacoesEquipeId(equipeObject[0].id)
+                        relacoes = relacoesResult.items.relations
+
+                        for (relacao of relacoes) {
+
+                            deleteRelacao = await profissionalEquipeController.excluirProfissionalEquipe(relacao.id)
+
+                            if (deleteRelacao.status_code != 200) {
+                                return deleteRelacao
+                            }
+
+                        }
+
+                        for (object of equipeObject) {
+
+                            idEquipe = equipeObject[0].id
+                            
+                            for(profissional of equipe.profissionais) {
+
+                                idProfissional = profissional.id_profissional
+
+                                equipeProfissionalObject = {id_profissional: idProfissional, id_equipe: idEquipe}
+
+                                resultProfissionalEquipe = await profissionalEquipeController.inserirProfissionalEquipe(equipeProfissionalObject, contentType)
+
+                                if (resultProfissionalEquipe.status_code != 201) {
+
+                                    MESSAGES.ERROR_RELATINAL_INSERTION += ' [PROFISSIONAL_EQUIPE]'
+                                    return MESSAGES.ERROR_RELATINAL_INSERTION //500
+
+                                }
+
+                            }
+
+                        }
 
                         equipeAtualizada = await buscarEquipeId(id)
 
@@ -194,39 +284,18 @@ const excluirEquipe = async (id) => {
 
     try {
 
-        let validarId = await buscarProfissionalId(id) 
+        let validarId = await buscarEquipeId(id) 
     
         if (validarId.status_code == 200) {
 
-            relacoesProfissionalCargo = await controllerProfissionalCargo.listarProfissionaisCargos() 
-            
-            listaRelacoesProfissionalCargo = relacoesProfissionalCargo.items.professionals_roles
-
-            for (let relacao of listaRelacoesProfissionalCargo) {
-
-                if (relacao.id_profissional == id) {
-
-                    idRelacao = relacao.id
-
-                    resultDeleteProfissionalCargo = await controllerProfissionalCargo.excluirProfissionalCargo(idRelacao)
-
-                    if(resultDeleteProfissionalCargo.status_code != 200) {
-                        MESSAGES.ERROR_RELATINAL_INSERTION.message += " [PROFISSIONAL CARGO]" 
-                        return MESSAGES.ERROR_RELATINAL_INSERTION // 500 Problema na tabela de relação
-                    }
-
-                }
-
-            }
-
-            result = await equipeDAO.setDeleteProfessionalById(id)
+            resultEquipe = await equipeDAO.setDeleteTeamById(id)
 
             if(result) {
 
-                MESSAGES.DEFAULT_HEADER.status                              = MESSAGES.SUCCESS_DELETE.status
-                MESSAGES.DEFAULT_HEADER.status_code                         = MESSAGES.SUCCESS_DELETE.status_code
-                MESSAGES.DEFAULT_HEADER.message                             = MESSAGES.SUCCESS_DELETE.message
-                MESSAGES.DEFAULT_HEADER.items.deleted_professional          = validarId.items.professional
+                MESSAGES.DEFAULT_HEADER.status                   = MESSAGES.SUCCESS_DELETE.status
+                MESSAGES.DEFAULT_HEADER.status_code              = MESSAGES.SUCCESS_DELETE.status_code
+                MESSAGES.DEFAULT_HEADER.message                  = MESSAGES.SUCCESS_DELETE.message
+                MESSAGES.DEFAULT_HEADER.items.deleted_team       = validarId.items.team
 
                 return MESSAGES.DEFAULT_HEADER
 

@@ -94,7 +94,7 @@ const getSelectProfessionalsByTeamId = async (team_id) => {
 }
 
 // Retorna todos as equipes que determinado profissional participa.
-const getSelectTeamIdByProfessionalId = async (team_id) => {
+const getSelectTeamIdByProfessionalId = async (professional_id) => {
 
     try {
         
@@ -110,7 +110,27 @@ const getSelectTeamIdByProfessionalId = async (team_id) => {
                     tb_profissional ON
                         tb_profissional.id = tb_profissional_equipe.id_profissional
                         
-                    WHERE tb_profissional.id = ${team_id}`
+                    WHERE tb_profissional.id = ${professional_id}`
+
+        result = await prisma.$queryRawUnsafe(sql)
+
+        if(Array.isArray(result)) {
+            return result
+        } else {
+            return false
+        }
+
+    } catch (error) {
+        return false
+    }
+
+}
+
+const getSelectRelationByTeamId = async (team_id) => {
+
+    try {
+        
+        sql = `SELECT * FROM tb_profissional_equipe WHERE id_equipe_tecnica = ${team_id}`
 
         result = await prisma.$queryRawUnsafe(sql)
 
@@ -225,6 +245,7 @@ module.exports = {
     getSelectProfessionalTeamById,
     getSelectProfessionalsByTeamId,
     getSelectTeamIdByProfessionalId,
+    getSelectRelationByTeamId,
     getSelectLastTeamProfessional,
     setInsertProfessionalTeam,
     setUpdateProfessionalTeam,

@@ -179,7 +179,53 @@ const listarProfissionaisEquipeId = async (id_equipe) => {
 
 }
 
+const listarRelacoesEquipeId = async (id_equipe) => {
+
+    // Cópia do objeto DEFAULT_MESSAGES
+    let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
+
+    try {
+
+        if (!isNaN(id_equipe) && id_equipe != '' && id_equipe != null && id_equipe > 0) {
+
+            let result = await profissionalEquipeDAO.getSelectRelationByTeamId(id_equipe)
+
+            if (result) {
+                if (result.length > 0) {
+
+                    MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_REQUEST.status
+                    MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCESS_REQUEST.status_code
+                    MESSAGES.DEFAULT_HEADER.items.relations     = result
+
+                    return MESSAGES.DEFAULT_HEADER //200
+
+                } else {
+
+                    return MESSAGES.ERROR_NOT_FOUND //404
+
+                }
+
+            } else {
+
+                return MESSAGES.ERROR_INTERNAL_SERVER_MODEL //500
+            }
+
+        } else {
+
+            return MESSAGES.ERROR_REQUIRED_FIELDS //400
+
+        }
+
+    } catch (error) {
+
+        return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
+
+    }
+
+}
+
 const inserirProfissionalEquipe = async (profissionalEquipe, contentType) => {
+    
     // Cópia do objeto DEFAULT_MESSAGES
     let MESSAGES = JSON.parse(JSON.stringify(DEFAULT_MESSAGES))
 
@@ -197,7 +243,7 @@ const inserirProfissionalEquipe = async (profissionalEquipe, contentType) => {
                 
                 if (result) {
 
-                    let profissionalEquipeCriado = await profissionalEquipeDAO.getSelectLastRoleProfessional()
+                    let profissionalEquipeCriado = await profissionalEquipeDAO.getSelectLastTeamProfessional()
                     
                     if (profissionalEquipeCriado) {
                         
@@ -366,6 +412,7 @@ module.exports = {
     buscarProfissionalEquipeId,
     buscarEquipeIdProfissionalId,
     listarProfissionaisEquipeId,
+    listarRelacoesEquipeId,
     inserirProfissionalEquipe,
     atualizarProfissionalEquipe,
     excluirProfissionalEquipe,

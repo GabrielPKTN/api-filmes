@@ -18,6 +18,14 @@ const filmeDistribuidoraController = require("./controller_filme_distribuidora.j
 // Import da controller da relação entre filme e estudio
 const filmeEstudioController = require("./controller_filme_estudio.js")
 
+//Import das controllers que envolvem a equipe técnica do filme
+const equipeTecnicaController = require("../equipe_tecnica/controller_equipe_tecnica.js")
+const filmeEquipeController   = require("./controller_filme_equipe_tecnica.js")
+
+//Import da controller de profissionais
+const profissionalController       = require("../profissional/controller_profissional.js")
+const profissionalEquipeController = require("../profissional/controller_profissional_equipe.js")
+
 const DEFAULT_MESSAGES = require("../modulo/config_messages.js")
 
 // Lista os todos os filmes
@@ -39,6 +47,8 @@ const listarFilmes = async () => {
                 
                 for (let filme of resultFilmes) {
                     
+                    idFilme = filme.id
+
                     let resultFilmeGenero = await filmeGeneroController.listarGenerosFilmeId(filme.id)
 
                     if (resultFilmeGenero.status_code == 200) {
@@ -56,6 +66,41 @@ const listarFilmes = async () => {
                         filme.estudio = resultFilmeEstudio.items.movie_studio
                     }
 
+                    resultEquipe = await filmeEquipeController.buscarEquipeFilmeId(idFilme)
+                    if(resultEquipe.status_code == 200) {
+                        
+                        equipeId = resultEquipe.items.team[0].id
+
+                        equipe = await equipeTecnicaController.buscarEquipeId(equipeId)
+
+                        profissionalArray = equipe.items.team[0].profissionais
+
+                        profissionais = []
+
+                        if (profissionalArray != undefined) {
+
+                            for (profissional of profissionalArray) {
+
+                                idProfissional = profissional.id
+
+                                resultProfissional = await profissionalController.buscarProfissionalId(idProfissional)
+                                
+                                profissionalObject = resultProfissional.items.professional[0]
+
+                                profissionais.push(profissionalObject)
+
+                            }
+
+                        }
+
+                        delete equipe.items.team[0].profissionais
+
+                        equipe.items.team[0].profissionais = profissionais
+
+                        filme.equipe_tecnica = equipe.items.team
+
+                    }
+
                 }
                 
                 MESSAGES.DEFAULT_HEADER.items.filme = resultFilmes    
@@ -70,7 +115,6 @@ const listarFilmes = async () => {
         }
 
     } catch (error) {
-        
         return MESSAGES.ERROR_INTERNAL_SERVER_CONTROLLER //500
     }
 
@@ -116,11 +160,47 @@ const buscarFilmeId = async (id) => {
 
                         resultFilmeEstudio = await filmeEstudioController.listarEstudiosFilmeId(id_filme)
 
-                        if (resultFilmeEstudio.status_code == 200) [
+                        if (resultFilmeEstudio.status_code == 200) {
 
                             filme.estudio = resultFilmeEstudio.items.movie_studio
 
-                        ]
+                        }
+
+                        resultEquipe = await filmeEquipeController.buscarEquipeFilmeId(id_filme)
+
+                        if(resultEquipe.status_code == 200) {
+                        
+                            equipeId = resultEquipe.items.team[0].id
+
+                            equipe = await equipeTecnicaController.buscarEquipeId(equipeId)
+
+                            profissionalArray = equipe.items.team[0].profissionais
+
+                            profissionais = []
+
+                            if (profissionalArray != undefined) {
+
+                                for (profissional of profissionalArray) {
+
+                                    idProfissional = profissional.id
+
+                                    resultProfissional = await profissionalController.buscarProfissionalId(idProfissional)
+                                    
+                                    profissionalObject = resultProfissional.items.professional[0]
+
+                                    profissionais.push(profissionalObject)
+
+                                }
+
+                            }
+
+                            delete equipe.items.team[0].profissionais
+
+                            equipe.items.team[0].profissionais = profissionais
+
+                            filme.equipe_tecnica = equipe.items.team
+
+                        }
 
                     }
 
@@ -224,45 +304,33 @@ const inserirFilme = async (filme, contentType) => {
 
                         }
 
+                        profissionais = []
 
-                        filme = filmeCriado[0]
+                        for (let profissional of filme.profissionais) {
+
+                            let resultProfissional = await profissionalController.inserirProfissional(profissional, contentType)
+                            
+                            idProfissionalCriado = resultProfissional.items.professional_created.id
+
+                            profissionais.push({id_profissional: idProfissionalCriado})
+
+                        }
+
+                        equipeObject = {
+                            id_filme: filmeCriado[0].id,
+                            profissionais: profissionais            
+                        }
+
+                        resultEquipe = await equipeTecnicaController.inserirEquipe(equipeObject, contentType)
+
+                        filmeAtualizado = await buscarFilmeId(filmeCriado[0].id)
+                        filme = filmeAtualizado.items.movie
 
                         //Adiciona o id no json com os dados do filme
 
                         MESSAGES.DEFAULT_HEADER.status          = MESSAGES.SUCCESS_CREATED_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code     = MESSAGES.SUCCESS_CREATED_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message         = MESSAGES.SUCCESS_CREATED_ITEM.message
-                        
-                        //Adicionar no JSON dados do genero
-
-                        // deleta o atributo genero de filme
-                        delete filme.genero
-                        
-                        // Pesquisa no banco de dados todos os generos atribuidos ao filme
-                        let resultFilmeGenero = await filmeGeneroController.listarGenerosFilmeId(filmeCriado[0].id)
-
-                        // Cria novamento o atributo genero mas agora com id e nome.
-                        filme.genero = resultFilmeGenero.items.movie_genres
-
-                        // deleta o atributo distribuidora de filme
-                        delete filme.distribuidora
-
-                        // Pesquisa no banco de dados todos as distribuidoras atribuidos ao filme
-                        let resultFilmeDistribuidora = await filmeDistribuidoraController.listarDistribuidorasFilmeId(filmeCriado[0].id)
-
-                        // Cria novamente o atributo distribuidora mas agora com id e nome.
-                        filme.distribuidora = resultFilmeDistribuidora.items.distributors
-
-                        delete filme.estudio 
-
-                        let resultFilmeEstudio = await filmeEstudioController.listarEstudiosFilmeId(filmeCriado[0].id)
-
-                        filme.estudio = resultFilmeEstudio.items.movie_studio
-
-
-
-
-
 
                         MESSAGES.DEFAULT_HEADER.items.created_movie = filme
 
@@ -438,34 +506,71 @@ const atualizarFilme = async (filme, id, contentType) => {
 
                         }
 
-                        /********************************************************************/
+                        //Busca a equipe do filme
+                        equipe = await filmeEquipeController.buscarEquipeFilmeId(id)
 
+                        //Busca a equipe tecnica do filme
+                        for (object of equipe.items.team) {
+                            
+                            //Extrai o id da equipe
+                            idEquipe = object.id
+                            
+                            //Busca todos os registros que contem o id dessa equipe
+                            relacoesEquipesProfissionais = await profissionalEquipeController.listarRelacoesEquipeId(idEquipe)
+
+                            //Extrai o array de relacao dessa equipe
+                            relacoes = relacoesEquipesProfissionais.items.relations
+
+                            for (relacao of relacoes) {
+
+                                idRelacao = relacao.id
+
+                                //Deleta cada registro com o id de equipe desse filme
+                                resultDelete = await profissionalEquipeController.excluirProfissionalEquipe(idRelacao)
+
+                                if(resultDelete.status_code != 200) {
+                                    return resultDelete
+                                }
+
+                            }
+                            
+                            //Deleta a equipe
+                            deleteEquipe = await equipeTecnicaController.excluirEquipe(idEquipe)
+                            
+                            if(deleteEquipe.status_code != 200) {
+                                return deleteEquipe
+                            }
+
+                        }
+
+                        profissionais = []
+
+                        for (let profissional of filme.profissionais) {
+
+                            let resultProfissional = await profissionalController.inserirProfissional(profissional, contentType)
+                            
+                            idProfissionalCriado = resultProfissional.items.professional_created.id
+
+                            profissionais.push({id_profissional: idProfissionalCriado})
+                            
+                        }
+
+
+                        equipeObject = {
+                            id_filme: Number(id),
+                            profissionais: profissionais            
+                        }
+
+                        resultEquipe = await equipeTecnicaController.inserirEquipe(equipeObject, contentType)
                         
-                        delete filme.genero
-                        // Pesquisa no banco de dados todos os generos atribuidos ao filme
-                        let resultFilmeGenero = await filmeGeneroController.listarGenerosFilmeId(id)
-                        
-                        // Cria novamento o atributo genero mas agora com id e nome.
-                        filme.genero = resultFilmeGenero.items.movie_genres
-
-                        delete filme.distribuidora
-
-                        let resultFilmeDistribuidora = await filmeDistribuidoraController.listarDistribuidorasFilmeId(id)
-
-                        filme.distribuidora = resultFilmeDistribuidora.items.distributors
-
-                        delete filme.estudio
-
-                        let resultFilmeEstudio = await filmeEstudioController.listarEstudiosFilmeId(id)
-
-                        filme.estudio = resultFilmeEstudio.items.movie_studio
-
+                        filmeAtualizado = await buscarFilmeId(id)
+                        filme = filmeAtualizado.items.movie
 
                         MESSAGES.DEFAULT_HEADER.status              = MESSAGES.SUCCESS_UPDATE_ITEM.status
                         MESSAGES.DEFAULT_HEADER.status_code         = MESSAGES.SUCCESS_UPDATE_ITEM.status_code
                         MESSAGES.DEFAULT_HEADER.message             = MESSAGES.SUCCESS_UPDATE_ITEM.message
-
                         MESSAGES.DEFAULT_HEADER.items.updated_movie = filme
+
                         return MESSAGES.DEFAULT_HEADER //200
 
                     } else {
